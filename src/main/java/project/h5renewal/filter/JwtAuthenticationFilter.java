@@ -26,12 +26,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) request;
 
-        System.out.println("req.getRequestURI() = " + req.getRequestURI());
-
-        Arrays.stream(whiteList).forEach((w) -> {
-            System.out.println(req.getRequestURI() + " " + w.contains(req.getRequestURI()));
-        });
-
         if (!Arrays.stream(whiteList).anyMatch(a -> a.contains(req.getRequestURI()))) {
             //get token info
             String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
