@@ -1,6 +1,7 @@
 package project.hrpjt.login.controller;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -11,11 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import project.hrpjt.exception.CookieExpireException;
 import project.hrpjt.login.dto.LoginParamDto;
 import project.hrpjt.login.kakaologinmanager.AccessToken;
 import project.hrpjt.login.service.LoginService;
 
-import java.util.Map;
+import java.util.Arrays;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,7 +32,6 @@ public class LoginController {
         loginService.login(param, response);
         return "로그인 완료";
     }
-
 
     @GetMapping("/kakao")
     public String kakaoForm() {
