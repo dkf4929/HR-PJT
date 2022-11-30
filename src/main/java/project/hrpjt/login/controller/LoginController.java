@@ -39,27 +39,8 @@ public class LoginController {
 
     @GetMapping("/login/kakao")
     public String kakaoLogin(String code, HttpServletResponse response) throws ParseException {
-        Map<String, Object> map = loginService.kakaoLogin(code);
 
-        if (map == null) {
-            throw new IllegalArgumentException("인증정보가 없습니다.");
-        }
-
-        Cookie cookie = new Cookie("kakaoAccount", String.valueOf(map.get("access_token")));
-
-        response.addCookie(cookie);
-
-        return "redirect:/members/add?kakaoMail=" + emailEncode(map);
-    }
-
-    private String emailEncode(Map<String, Object> map) throws ParseException {
-        JSONParser parser = new JSONParser();
-
-        String account = String.valueOf(map.get("account"));
-
-        JSONObject jsonObj = (JSONObject) parser.parse(account);
-
-        return encoder.encode(String.valueOf(jsonObj.get("email")));
+        return "redirect:" + loginService.kakaoLogin(code, response);
     }
 
     @GetMapping("/test")

@@ -40,6 +40,8 @@ public class Member implements UserDetails {
 
     private String kakaoMail;
 
+    private String kakaoId;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> list = new ArrayList<>();

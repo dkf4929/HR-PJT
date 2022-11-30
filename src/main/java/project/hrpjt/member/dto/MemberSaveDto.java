@@ -20,4 +20,6 @@ public class MemberSaveDto {
     private String role;
 
     private String kakaoMail;
+
+    private String kakaoId;
 }
