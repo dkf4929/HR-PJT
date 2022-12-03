@@ -1,32 +1,31 @@
-package project.hrpjt.member.service;
+package project.hrpjt.employee.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import project.hrpjt.exception.NoSuchMemberException;
-import project.hrpjt.member.repository.MemberRepository;
+import project.hrpjt.employee.repository.EmployeeRepository;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
-public class CustomMemberDetailsService implements UserDetailsService {
-    private final MemberRepository memberRepository;
+public class CustomEmployeeDetailsService implements UserDetailsService {
+    private final EmployeeRepository employeeRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (checkMail(username)) {
-            return memberRepository.findByKakaoMail(username).orElseThrow(
+            return employeeRepository.findByKakaoMail(username).orElseThrow(
                     () -> {
-                        throw new NoSuchMemberException("카카오 계정이 유효하지 않습니다.");
+                        throw new UsernameNotFoundException("카카오 계정이 유효하지 않습니다.`");
                     });
         } else {
-            return memberRepository.findByLoginId(username).orElseThrow(
+            return employeeRepository.findByemployeeNo(username).orElseThrow(
                     () -> {
-                        throw new NoSuchMemberException("가입되지 않은 사용자입니다.");
+                        throw new UsernameNotFoundException("가입되지 않은 사용자입니다.");
                     });
         }
     }

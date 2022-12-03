@@ -9,12 +9,13 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import project.hrpjt.exception.NoSuchMemberException;
+import org.springframework.transaction.annotation.Transactional;
+import project.hrpjt.employee.entity.Employee;
+import project.hrpjt.exception.NoSuchEmployeeException;
 import project.hrpjt.login.dto.LoginParamDto;
-import project.hrpjt.login.kakaologinmanager.AccessToken;
-import project.hrpjt.member.entity.Member;
-import project.hrpjt.member.repository.MemberRepository;
-import project.hrpjt.tokenmanager.JwtTokenProvider;
+import project.hrpjt.security.kakaologinmanager.AccessToken;
+import project.hrpjt.employee.repository.EmployeeRepository;
+import project.hrpjt.security.tokenmanager.JwtTokenProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,26 +25,27 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
 public class LoginService {
-    private final MemberRepository memberRepository;
+    private final EmployeeRepository employeeRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AccessToken token;
     private final PasswordEncoder encoder;
 
     public void login(LoginParamDto param, HttpServletResponse response) {
-        Member member = memberRepository.findByLoginId(param.getLoginId())
+        Employee employee = employeeRepository.findByemployeeNo(param.getEmployeeNo())
                 .orElseThrow(() -> {
-                    throw new NoSuchMemberException("등록된 아이디가 없습니다.");
+                    throw new NoSuchEmployeeException("등록된 아이디가 없습니다.");
                 });
 
-        if (!encoder.matches(param.getPassword(), member.getPassword())) {
-            throw new NoSuchMemberException("패스워드가 일치하지 않습니다.");
+        if (!encoder.matches(param.getPassword(), employee.getPassword())) {
+            throw new NoSuchEmployeeException("패스워드가 일치하지 않습니다.");
         }
 
         List<String> list = new ArrayList<>();
-        list.add(member.getRole());
-        String token = jwtTokenProvider.createToken(param.getLoginId(), list);
+        list.add(employee.getRole());
+        String token = jwtTokenProvider.createToken(param.getEmployeeNo(), list);
 
         Cookie cookie = new Cookie("jwtToken", token);
         cookie.setPath("/");
@@ -66,20 +68,20 @@ public class LoginService {
     private String getRedirectURI(HttpServletResponse response, String email, String kakaoId) {
         String redirectURI = "";
 
-        Optional<Member> member = memberRepository.findByKakaoId(kakaoId);
+        Optional<Employee> employee = employeeRepository.findByKakaoId(kakaoId);
 
-        if (member.isPresent()) {
+        if (employee.isPresent()) {
             List<String> list = new ArrayList<String>();
             list.add("ROLE_USER");
 
-            String kakaoToken = jwtTokenProvider.createToken(member.get().getKakaoMail(), list);
+            String kakaoToken = jwtTokenProvider.createToken(employee.get().getKakaoMail(), list);
 
             Cookie cookie = new Cookie("jwtToken", kakaoToken);
             cookie.setPath("/");
             response.addCookie(cookie);
             redirectURI = "/";
         } else {
-            redirectURI = "/members/add?kakaoId=" + kakaoId + "&kakaoMail=" + email;
+            redirectURI = "/employees/add?kakaoId=" + kakaoId + "&kakaoMail=" + email;
         }
         return redirectURI;
     }
