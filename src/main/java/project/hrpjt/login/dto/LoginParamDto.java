@@ -5,6 +5,6 @@ import lombok.*;
 @Getter
 @Setter
 public class LoginParamDto {
-    private String loginId;
+    private String employeeNo;
     private String password;
 }

@@ -1,4 +1,4 @@
-package project.hrpjt.tokenmanager;
+package project.hrpjt.security.tokenmanager;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

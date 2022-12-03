@@ -1,4 +1,4 @@
-package project.hrpjt.login.kakaologinmanager;
+package project.hrpjt.security.kakaologinmanager;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;

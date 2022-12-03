@@ -1,4 +1,4 @@
-package project.hrpjt.tokenmanager;
+package project.hrpjt.security.tokenmanager;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
