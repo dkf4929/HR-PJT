@@ -1,8 +1,9 @@
 package project.hrpjt.employee.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import project.hrpjt.base.SubEntity;
 import project.hrpjt.family.entity.Family;
+import project.hrpjt.organization.entity.Organization;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class Employee extends SubEntity implements UserDetails {
     @Column(unique = true, nullable = false, length = 10)
     private String employeeNo;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, length = 15)
@@ -56,12 +58,16 @@ public class Employee extends SubEntity implements UserDetails {
     @OneToMany(mappedBy = "employee")
     private List<Family> families = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "org_id")
+    private Organization organization;
+
     public void addFamily(Family family) {
         families.add(family);
     }
 
     @Builder
-    public Employee(String employeeNo, String password, String role, String employeeName, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId) {
+    public Employee(String employeeNo, String password, String role, String employeeName, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId, Organization organization) {
         this.employeeNo = employeeNo;
         this.password = password;
         this.role = role;
@@ -72,6 +78,7 @@ public class Employee extends SubEntity implements UserDetails {
         this.retireDate = retireDate;
         this.kakaoMail = kakaoMail;
         this.kakaoId = kakaoId;
+        this.organization = organization;
     }
 
     @Override
@@ -106,5 +113,33 @@ public class Employee extends SubEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void updateEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateRole(String role) {
+        this.role = role;
+    }
+
+    public void updateEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
+    public void updateHireDate(LocalDate hireDate) {
+        this.hireDate = hireDate;
+    }
+
+    public void updatRetireDate(LocalDate retireDate) {
+        this.retireDate = retireDate;
+    }
+
+    public void updateOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

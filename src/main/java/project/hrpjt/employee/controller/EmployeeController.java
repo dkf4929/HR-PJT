@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import project.hrpjt.employee.dto.EmployeeFindDto;
 import project.hrpjt.employee.dto.EmployeeSaveDto;
+import project.hrpjt.employee.dto.EmployeeUpdateDto;
 import project.hrpjt.employee.service.EmployeeService;
 
 @Controller
@@ -32,15 +33,21 @@ public class EmployeeController {
     }
 
     @ResponseBody
-    @GetMapping("/all") //모든 회원 조회(관리자)
+    @GetMapping() //모든 회원 조회(관리자)
     public Page<EmployeeFindDto> findAllEmployees(Pageable pageable) {
         return employeeService.findAll(pageable);
     }
 
     @ResponseBody
     @DeleteMapping("/delete") //회원 삭제(관리자) - 같은 권한을 가진 관리자는 삭제 불가.
-    public String deleteEmployee(@RequestBody Long employeeId) {
+    public String deleteEmployee(Long employeeId) {
         employeeService.delete(employeeId);
         return "삭제 되었습니다.";
+    }
+
+    @ResponseBody
+    @PutMapping("/edit")
+    public EmployeeFindDto editInfo(@RequestBody EmployeeUpdateDto param) {
+        return employeeService.edit(param);
     }
 }

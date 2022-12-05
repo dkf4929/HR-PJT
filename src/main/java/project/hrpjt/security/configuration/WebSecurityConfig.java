@@ -21,8 +21,8 @@ import project.hrpjt.security.tokenmanager.JwtTokenProvider;
 public class WebSecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final String[] whiteList = {"/", "/login", "/login/kakao", "/kakao", "/logout"};  // security 적용 안할 path 설정
-    private final String[] adminPath = {"/employees/all", "/employees/*/delete", "/employees/add"}; // 관리자 허용 path
-    private final String[] userPath = {"/employees/**"}; // user 허용 path
+    private final String[] adminPath = {"/employees", "/employees/*/delete", "/employees/add", "/organization/add"}; // 관리자 허용 path
+    private final String[] userPath = {"/employees/**"}; // 직원 허용 path
     private final UserOAuth2Service userOAuth2Service;
     private final AccessDeniedHandler accessDeniedHandler;
 
@@ -39,8 +39,8 @@ public class WebSecurityConfig {
         http.httpBasic().disable()
                 .authorizeHttpRequests()
                 .requestMatchers(whiteList).permitAll() // 인증 허용 경로 설정
-                .requestMatchers(adminPath).hasRole("ADMIN")
-                .requestMatchers(userPath).hasAnyRole("USER", "ADMIN")
+                .requestMatchers(adminPath).hasRole("SYS_ADMIN")
+                .requestMatchers(userPath).hasAnyRole("EMPLOYEE", "SYS_ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class) //jwt 토큰 인증 필터

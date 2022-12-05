@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import project.hrpjt.organization.entity.Organization;
 
 import java.time.LocalDate;
 
@@ -14,30 +15,15 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class EmployeeSaveDto {
-    @NotEmpty
     private String employeeNo;
-
-    @NotEmpty
     private String password;
-
-    @NotEmpty
     private String role;
-
-    @NotEmpty
     private String employeeName;
-
-    @NotEmpty
     private String gender;
-
-    @NotNull
     private LocalDate birthDate;
-
-    @NotNull
     private LocalDate hireDate;
-
     private LocalDate retireDate;
-
-    @Email
+    private Organization organization;
     private String kakaoMail;
     private String kakaoId;
 }
