@@ -1,7 +1,7 @@
 package project.hrpjt.base;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public class SubEntity extends BaseEntity {

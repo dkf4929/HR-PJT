@@ -1,6 +1,6 @@
 package project.hrpjt.family.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import project.hrpjt.base.SubEntity;
 import project.hrpjt.employee.entity.Employee;
 
