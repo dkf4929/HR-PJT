@@ -26,7 +26,7 @@ public class Employee extends SubEntity implements UserDetails {
     private Long id;
 
     @Column(unique = true, nullable = false, length = 10)
-    private String employeeNo;
+    private String empNo;
 
     @Column(nullable = false)
     private String password;
@@ -35,7 +35,7 @@ public class Employee extends SubEntity implements UserDetails {
     private String role;
 
     @Column(nullable = false, length = 20)
-    private String employeeName;
+    private String empNm;
 
     @Column(nullable = false, length = 1)
     private String gender;
@@ -64,11 +64,11 @@ public class Employee extends SubEntity implements UserDetails {
     }
 
     @Builder
-    public Employee(String employeeNo, String password, String role, String employeeName, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId, Organization organization) {
-        this.employeeNo = employeeNo;
+    public Employee(String empNo, String password, String role, String empNm, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId, Organization organization) {
+        this.empNo = empNo;
         this.password = password;
         this.role = role;
-        this.employeeName = employeeName;
+        this.empNm = empNm;
         this.gender = gender;
         this.birthDate = birthDate;
         this.hireDate = hireDate;
@@ -89,7 +89,7 @@ public class Employee extends SubEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.employeeName;
+        return this.empNm;
     }
 
     @Override
@@ -112,8 +112,8 @@ public class Employee extends SubEntity implements UserDetails {
         return true;
     }
 
-    public void updateEmployeeNo(String employeeNo) {
-        this.employeeNo = employeeNo;
+    public void updateempNo(String empNo) {
+        this.empNo = empNo;
     }
 
     public void updatePassword(String password) {
@@ -124,8 +124,8 @@ public class Employee extends SubEntity implements UserDetails {
         this.role = role;
     }
 
-    public void updateEmployeeName(String employeeName) {
-        this.employeeName = employeeName;
+    public void updateempNm(String empNm) {
+        this.empNm = empNm;
     }
 
     public void updateHireDate(LocalDate hireDate) {

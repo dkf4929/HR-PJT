@@ -33,8 +33,8 @@ public class LoginService {
     private final AccessToken token;
     private final PasswordEncoder encoder;
 
-    public void login(LoginParamDto param, HttpServletResponse response) {
-        Employee employee = employeeRepository.findByemployeeNo(param.getEmployeeNo())
+    public String login(LoginParamDto param, HttpServletResponse response) {
+        Employee employee = employeeRepository.findByempNo(param.getEmpNo())
                 .orElseThrow(() -> {
                     throw new NoSuchEmployeeException("등록된 아이디가 없습니다.");
                 });
@@ -45,11 +45,13 @@ public class LoginService {
 
         List<String> list = new ArrayList<>();
         list.add(employee.getRole());
-        String token = jwtTokenProvider.createToken(param.getEmployeeNo(), list);
+        String token = jwtTokenProvider.createToken(param.getEmpNo(), list);
 
         Cookie cookie = new Cookie("jwtToken", token);
         cookie.setPath("/");
         response.addCookie(cookie);
+
+        return token;
     }
 
     public String kakaoLogin(String code, HttpServletResponse response) throws ParseException {

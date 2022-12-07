@@ -15,10 +15,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class EmployeeSaveDto {
-    private String employeeNo;
+    private String empNo;
     private String password;
     private String role;
-    private String employeeName;
+    private String empNm;
     private String gender;
     private LocalDate birthDate;
     private LocalDate hireDate;

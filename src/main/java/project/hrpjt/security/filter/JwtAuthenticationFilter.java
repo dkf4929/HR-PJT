@@ -46,6 +46,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 log.info("authentication info = {}", SecurityContextHolder.getContext().getAuthentication());
 
         }
+
+        log.info("--------------jwt auth filter--------------");
         chain.doFilter(request, response);
     }
 

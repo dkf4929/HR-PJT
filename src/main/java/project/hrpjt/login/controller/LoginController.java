@@ -23,8 +23,7 @@ public class LoginController {
     @PostMapping("/login")
     @ResponseBody
     public String login(LoginParamDto param, HttpServletResponse response) {
-        loginService.login(param, response);
-        return "로그인 완료";
+        return loginService.login(param, response);
     }
 
     @GetMapping("/kakao")

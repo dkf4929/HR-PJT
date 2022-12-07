@@ -15,9 +15,9 @@ import java.time.LocalDate;
 public class EmployeeUpdateDto {
     private Long employeeId;
     private Long organizationId;
-    private String employeeNo;
+    private String empNo;
     private String password;
     private String role;
-    private String employeeName;
+    private String empNm;
     private LocalDate retireDate;
 }
