@@ -75,8 +75,8 @@ public class OrganizationService {
         String role = loginEmp.getRole();
 
         if ((role.equals("ROLE_EMPLOYEE") || role.equals("ROLE_ORG_LEADER")) &&
-                (!param.getOrgNo().equals(loginEmp.getOrganization().getOrgNo()) ||
-                        (!param.getOrgNm().equals(loginEmp.getOrganization().getOrgNm())))) {
+            (param.getOrgNo() != null && !param.getOrgNo().equals(loginEmp.getOrganization().getOrgNo()) ||
+            (param.getOrgNm() != null && !param.getOrgNm().equals(loginEmp.getOrganization().getOrgNm())))) {
             return false;
         } else {
             return true;

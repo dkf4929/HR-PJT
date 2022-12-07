@@ -116,7 +116,7 @@ public class OrganizationServiceTest {
     @Test
     @DisplayName("조직원 조회")
     void findOrganizer() throws Exception {
-        OrganizerFindParamDto dto = new OrganizerFindParamDto("000004", null);
+        OrganizerFindParamDto dto = new OrganizerFindParamDto("000001", null);
 
         String value = objectMapper.writeValueAsString(dto);
 
