@@ -6,7 +6,7 @@ import project.hrpjt.employee.entity.Employee;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    public Optional<Employee> findByemployeeNo(String employeeNo);
+    public Optional<Employee> findByempNo(String empNo);
 
     public Optional<Employee> findByKakaoId(String id);
 

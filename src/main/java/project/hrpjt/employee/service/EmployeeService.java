@@ -64,7 +64,7 @@ public class EmployeeService {
         });
 
         if (deleteEmployee.getRole().equals("ROLE_SYS_ADMIN")) {
-            throw new IllegalStateException("관리자는 삭제할 수 없습니다."); // 관리자는 해당 기능에서 삭제 불가
+            throw new IllegalStateException("관리자는 삭제할 수 없습니다.");
         }
 
         employeeRepository.deleteById(employeeId);
@@ -83,18 +83,14 @@ public class EmployeeService {
                         .orgNm(loginEmp.getOrganization().getOrgNm()).build())
                 .retireDate(loginEmp.getRetireDate())
                 .hireDate(loginEmp.getHireDate())
-                .employeeNo(loginEmp.getEmployeeNo())
+                .empNo(loginEmp.getEmpNo())
                 .gender(loginEmp.getGender())
-                .employeeName(loginEmp.getEmployeeName())
+                .empNm(loginEmp.getEmpNm())
                 .birthDate(loginEmp.getBirthDate())
                 .role(loginEmp.getRole())
                 .build();
     }
 
-//     1. 패스워드를 제외한 항목은 유저 권한을 가진 직원이 수정 불가능함.
-//     2. 관리자 권한을 가진 직원이 해당 직원을 같은 권한으로 설정할 수 없음.
-//     3. 변경 가능한 권한 항목 -> sys_admin(org_leader 권한 부여 가능), ceo(sys_admin 권한 부여 가능)
-//     4. 개인 정보는 해당 사원의 부서장 또는 시스템 관리자가 변경 가능. 사번, 성명, 조직은 시스템 관리자만 변경 가능.
     private void updateEmployeeInfo(String role, EmployeeUpdateDto param, Organization org) {
         Employee employee = employeeRepository.findById(param.getEmployeeId()).orElseThrow(() -> {
             throw new NoSuchEmployeeException("존재하지 않는 사원입니다.");
@@ -106,11 +102,11 @@ public class EmployeeService {
             employee.updateRole(param.getRole());
         }
 
-        if (param.getEmployeeNo() != null && role.equals("ROLE_SYS_ADMIN")) {
-            employee.updateEmployeeNo(param.getEmployeeNo());
+        if (param.getEmpNo() != null && role.equals("ROLE_SYS_ADMIN")) {
+            employee.updateempNo(param.getEmpNo());
         }
-        if (param.getEmployeeName() != null && role.equals("ROLE_SYS_ADMIN")) {
-            employee.updateEmployeeName(param.getEmployeeName());
+        if (param.getEmpNm() != null && role.equals("ROLE_SYS_ADMIN")) {
+            employee.updateempNm(param.getEmpNm());
         }
         if (param.getOrganizationId() != null && role.equals("ROLE_SYS_ADMIN")) {
             Organization organization = organizationRepository.findById(param.getOrganizationId()).get();
@@ -127,11 +123,11 @@ public class EmployeeService {
     private EmployeeFindDto entityToDto(Employee employee) {
         return EmployeeFindDto.builder()
                         .role(employee.getRole())
-                        .employeeName(employee.getEmployeeName())
+                        .empNm(employee.getEmpNm())
                         .birthDate(employee.getBirthDate())
                         .gender(employee.getGender())
 //                        .families(employee.getFamilies())
-                        .employeeNo(employee.getEmployeeNo())
+                        .empNo(employee.getEmpNo())
                         .hireDate(employee.getHireDate())
 //                        .organization(employee.getOrganization())
                         .retireDate(employee.getRetireDate())
@@ -140,9 +136,9 @@ public class EmployeeService {
 
     private Employee dtoToEntity(EmployeeSaveDto param) {
         return Employee.builder()
-                .employeeNo(param.getEmployeeNo())
+                .empNo(param.getEmpNo())
                 .password(encoder.encode(param.getPassword()))
-                .employeeName(param.getEmployeeName())
+                .empNm(param.getEmpNm())
                 .kakaoMail(param.getKakaoMail())
                 .hireDate(LocalDate.now())
                 .kakaoId(param.getKakaoId())

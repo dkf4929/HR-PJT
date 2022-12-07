@@ -23,7 +23,7 @@ public class CustomEmployeeDetailsService implements UserDetailsService {
                         throw new UsernameNotFoundException("카카오 계정이 유효하지 않습니다.`");
                     });
         } else {
-            return employeeRepository.findByemployeeNo(username).orElseThrow(
+            return employeeRepository.findByempNo(username).orElseThrow(
                     () -> {
                         throw new UsernameNotFoundException("가입되지 않은 사용자입니다.");
                     });

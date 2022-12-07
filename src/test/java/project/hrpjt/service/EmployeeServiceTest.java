@@ -1,7 +1,7 @@
 package project.hrpjt.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import javax.servlet.http.Cookie;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,27 +12,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.employee.dto.EmployeeFindDto;
-import project.hrpjt.employee.dto.EmployeeSaveDto;
 import project.hrpjt.employee.dto.EmployeeUpdateDto;
 import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.employee.repository.EmployeeRepository;
 import project.hrpjt.employee.service.EmployeeService;
 import project.hrpjt.exception.NoSuchEmployeeException;
-import project.hrpjt.organization.dto.OrganizationSaveDto;
-import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
 import project.hrpjt.organization.service.OrganizationService;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -47,7 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class EmployeeServiceTest {
     @Autowired EmployeeService employeeService;
-    @Autowired OrganizationRepository organizationRepository;
+    @Autowired
+    OrganizationRepository organizationRepository;
     @Autowired OrganizationService organizationService;
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
@@ -59,7 +52,7 @@ public class EmployeeServiceTest {
     @BeforeEach
     void each() throws Exception {
         mockMvc.perform(post("/login")
-                        .param("employeeNo", "ADMIN")  // admin 권한으로 로그인
+                        .param("empNo", "ADMIN")  // admin 권한으로 로그인
                         .param("password", "1234")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -73,7 +66,7 @@ public class EmployeeServiceTest {
     @DisplayName("유저 권한으로 사원 생성 시 redirect")
     void userAuthTest() throws Exception {
         mockMvc.perform(post("/login")
-                        .param("employeeNo", "USER")  // user 권한으로 로그인
+                        .param("empNo", "USER")  // user 권한으로 로그인
                         .param("password", "1234")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -83,8 +76,8 @@ public class EmployeeServiceTest {
                         .forEach((c) -> cookieValue.set(c.getValue())));   // result에서 쿠키값 추출
 
         mockMvc.perform(post("/role_adm/employees/add")
-                        .param("employeeNo", "userA")
-                        .param("employeeName", "userA")
+                        .param("empNo", "userA")
+                        .param("empNm", "userA")
                         .param("gender", "M")
                         .param("role", "ROLE_EMPLOYEE")
                         .param("organizationId", "2")
@@ -100,8 +93,8 @@ public class EmployeeServiceTest {
     @DisplayName("시스템 권한으로 직원 생성")
     void adminAuthTest() throws Exception {
         mockMvc.perform(post("/role_adm/employees/add")
-                        .param("employeeNo", "userA")
-                        .param("employeeName", "userA")
+                        .param("empNo", "userA")
+                        .param("empNm", "userA")
                         .param("gender", "M")
                         .param("role", "ROLE_EMPLOYEE")
                         .param("organizationId", "2")
@@ -142,7 +135,7 @@ public class EmployeeServiceTest {
     @DisplayName("직원 정보 수정")
     void update() throws Exception {
         EmployeeUpdateDto dto = EmployeeUpdateDto.builder()
-                .employeeId(3L)
+                .employeeId(5L)
                 .organizationId(1L)
                 .build();
 
@@ -156,7 +149,7 @@ public class EmployeeServiceTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        Employee employee = employeeRepository.findById(3L).get();
+        Employee employee = employeeRepository.findById(5L).get();
 
         Assertions.assertThat(employee.getOrganization().getOrgNm()).isEqualTo("company");
 

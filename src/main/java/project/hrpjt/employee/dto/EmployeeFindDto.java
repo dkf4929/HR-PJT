@@ -14,9 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class EmployeeFindDto {
-    private String employeeNo;
+    private String empNo;
     private String role;
-    private String employeeName;
+    private String empNm;
     private String gender;
     private LocalDate birthDate;
     private LocalDate hireDate;
