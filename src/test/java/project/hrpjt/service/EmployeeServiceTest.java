@@ -1,7 +1,8 @@
 package project.hrpjt.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import javax.servlet.http.Cookie;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +27,10 @@ import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.employee.repository.EmployeeRepository;
 import project.hrpjt.employee.service.EmployeeService;
 import project.hrpjt.exception.NoSuchEmployeeException;
+import project.hrpjt.organization.dto.OrganizationSaveDto;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
+import project.hrpjt.organization.service.OrganizationService;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,9 +48,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class EmployeeServiceTest {
     @Autowired EmployeeService employeeService;
     @Autowired OrganizationRepository organizationRepository;
+    @Autowired OrganizationService organizationService;
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
     @Autowired EmployeeRepository employeeRepository;
+
 
     AtomicReference<String> cookieValue = new AtomicReference<>("");
 
@@ -77,31 +82,29 @@ public class EmployeeServiceTest {
                         .filter((c) -> c.getName().equals("jwtToken"))
                         .forEach((c) -> cookieValue.set(c.getValue())));   // result에서 쿠키값 추출
 
-        mockMvc.perform(post("/employees/add")
+        mockMvc.perform(post("/role_adm/employees/add")
                         .param("employeeNo", "userA")
-                        .param("birthDate", "2000-01-01")
                         .param("employeeName", "userA")
                         .param("gender", "M")
                         .param("role", "ROLE_EMPLOYEE")
-                        .param("hireDate", "2022-12-05")
+                        .param("organizationId", "2")
                         .param("password", "1234")
                         .cookie(new Cookie("jwtToken", cookieValue.get()))  // set cookie
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is3xxRedirection())  // user 권한일 경우 직원 추가 권한 없음 redirect
+                .andExpect(status().isOk())  // admin 권한일 경우 ok
                 .andDo(print());
     }
 
     @Test
-    @DisplayName("admin 권한 직원 추가")
+    @DisplayName("시스템 권한으로 직원 생성")
     void adminAuthTest() throws Exception {
-        mockMvc.perform(post("/employees/add")
+        mockMvc.perform(post("/role_adm/employees/add")
                         .param("employeeNo", "userA")
-                        .param("birthDate", "2000-01-01")
                         .param("employeeName", "userA")
                         .param("gender", "M")
                         .param("role", "ROLE_EMPLOYEE")
-                        .param("hireDate", "2022-12-05")
+                        .param("organizationId", "2")
                         .param("password", "1234")
                         .cookie(new Cookie("jwtToken", cookieValue.get()))  // set cookie
                         .contentType(MediaType.APPLICATION_JSON)
@@ -122,8 +125,8 @@ public class EmployeeServiceTest {
     @Test
     @DisplayName("직원 삭제")
     void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/employees/delete")
-                        .param("employeeId", "2")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/employees/delete")
+                        .param("employeeId", "5")
                         .cookie(new Cookie("jwtToken", cookieValue.get()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -139,13 +142,13 @@ public class EmployeeServiceTest {
     @DisplayName("직원 정보 수정")
     void update() throws Exception {
         EmployeeUpdateDto dto = EmployeeUpdateDto.builder()
-                .employeeId(1L)
+                .employeeId(3L)
                 .organizationId(1L)
                 .build();
 
         String value = objectMapper.writeValueAsString(dto);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/employees/edit")
+        mockMvc.perform(MockMvcRequestBuilders.put("/role_emp/employees/edit")
                         .content(value)
                         .cookie(new Cookie("jwtToken", cookieValue.get()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -153,7 +156,7 @@ public class EmployeeServiceTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        Employee employee = employeeRepository.findById(1L).get();
+        Employee employee = employeeRepository.findById(3L).get();
 
         Assertions.assertThat(employee.getOrganization().getOrgNm()).isEqualTo("company");
 

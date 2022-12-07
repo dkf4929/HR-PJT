@@ -1,12 +1,8 @@
 package project.hrpjt.organization.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
 import lombok.*;
-import project.hrpjt.employee.entity.Employee;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +30,7 @@ public class Organization {
     @JoinColumn(name = "parent_id")
     private Organization parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<Organization> children = new ArrayList<>();
 
     @Builder

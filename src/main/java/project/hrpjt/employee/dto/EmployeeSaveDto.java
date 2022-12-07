@@ -1,9 +1,9 @@
 package project.hrpjt.employee.dto;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import javax.persistence.Column;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class EmployeeSaveDto {
     private LocalDate birthDate;
     private LocalDate hireDate;
     private LocalDate retireDate;
-    private Organization organization;
+    private Long organizationId;
     private String kakaoMail;
     private String kakaoId;
 }

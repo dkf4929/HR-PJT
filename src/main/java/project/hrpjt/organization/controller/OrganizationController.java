@@ -10,12 +10,11 @@ import project.hrpjt.organization.service.OrganizationService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/organization")
 public class OrganizationController {
 
     private final OrganizationService organizationService;
 
-    @PostMapping("/add")
+    @PostMapping("role_adm/organization/add")
     public Organization save(OrganizationSaveDto dto) {
         return organizationService.save(dto);
     }

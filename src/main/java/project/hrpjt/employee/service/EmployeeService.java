@@ -75,7 +75,7 @@ public class EmployeeService {
 
         String role = loginEmp.getRole(); // 로그인한 직원의 권한 정보
 
-        updateEmployeeInfo(role, param);
+        updateEmployeeInfo(role, param, loginEmp.getOrganization());
 
         return EmployeeFindDto.builder()
                 .organization(EmployeeOrgDto.builder()
@@ -95,7 +95,7 @@ public class EmployeeService {
 //     2. 관리자 권한을 가진 직원이 해당 직원을 같은 권한으로 설정할 수 없음.
 //     3. 변경 가능한 권한 항목 -> sys_admin(org_leader 권한 부여 가능), ceo(sys_admin 권한 부여 가능)
 //     4. 개인 정보는 해당 사원의 부서장 또는 시스템 관리자가 변경 가능. 사번, 성명, 조직은 시스템 관리자만 변경 가능.
-    private void updateEmployeeInfo(String role, EmployeeUpdateDto param) {
+    private void updateEmployeeInfo(String role, EmployeeUpdateDto param, Organization org) {
         Employee employee = employeeRepository.findById(param.getEmployeeId()).orElseThrow(() -> {
             throw new NoSuchEmployeeException("존재하지 않는 사원입니다.");
         });
@@ -116,7 +116,7 @@ public class EmployeeService {
             Organization organization = organizationRepository.findById(param.getOrganizationId()).get();
             employee.updateOrganization(organization);
         }
-        if (param.getRetireDate() != null && role.equals("ROLE_ORG_LEADER")) {
+        if (param.getRetireDate() != null && (role.equals("ROLE_ORG_LEADER") && org.getId() == employee.getOrganization().getId())) {
             employee.updatRetireDate(param.getRetireDate());
         }
         if (param.getPassword() != null) {
@@ -130,7 +130,7 @@ public class EmployeeService {
                         .employeeName(employee.getEmployeeName())
                         .birthDate(employee.getBirthDate())
                         .gender(employee.getGender())
-                        .families(employee.getFamilies())
+//                        .families(employee.getFamilies())
                         .employeeNo(employee.getEmployeeNo())
                         .hireDate(employee.getHireDate())
 //                        .organization(employee.getOrganization())
@@ -148,7 +148,7 @@ public class EmployeeService {
                 .kakaoId(param.getKakaoId())
                 .role(param.getRole())
                 .retireDate(param.getRetireDate())
-                .organization(param.getOrganization())
+                .organization(organizationRepository.findById(param.getOrganizationId()).get())
                 .birthDate(param.getBirthDate())
                 .gender(param.getGender())
                 .build();

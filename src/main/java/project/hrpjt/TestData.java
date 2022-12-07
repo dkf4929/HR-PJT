@@ -1,6 +1,6 @@
 package project.hrpjt;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +45,7 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_SYS_ADMIN")
                 .hireDate(LocalDate.now())
-                .organization(save2)
+                .organizationId(2L)
                 .password("1234")
                 .build();
 
@@ -56,7 +56,7 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_ORG_LEADER")
                 .hireDate(LocalDate.now())
-                .organization(save2)
+                .organizationId(2L)
                 .password("1234")
                 .build();
 
@@ -67,7 +67,7 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
                 .hireDate(LocalDate.now())
-                .organization(save2)
+                .organizationId(2L)
                 .password("1234")
                 .build();
 
