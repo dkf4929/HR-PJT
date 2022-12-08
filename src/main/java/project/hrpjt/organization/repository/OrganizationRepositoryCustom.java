@@ -1,5 +1,6 @@
 package project.hrpjt.organization.repository;
 
+import org.springframework.data.domain.Pageable;
 import project.hrpjt.organization.dto.OrganizationFindParamDto;
 import project.hrpjt.organization.dto.OrganizerFindDto;
 import project.hrpjt.organization.dto.OrganizerFindParamDto;

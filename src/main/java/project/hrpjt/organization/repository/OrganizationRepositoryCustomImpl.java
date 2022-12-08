@@ -1,11 +1,10 @@
 package project.hrpjt.organization.repository;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import project.hrpjt.employee.entity.QEmployee;
+import project.hrpjt.organization.dto.OrganizationFindDto;
 import project.hrpjt.organization.dto.OrganizationFindParamDto;
 import project.hrpjt.organization.dto.OrganizerFindDto;
 import project.hrpjt.organization.dto.OrganizerFindParamDto;
@@ -13,6 +12,8 @@ import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.entity.QOrganization;
 
 import javax.persistence.EntityManager;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,35 +40,35 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 .distinct()
                 .from(organization).leftJoin(organization.parent, parent).fetchJoin()
                 .from(organization).leftJoin(organization.children, children).fetchJoin()
-                .where(orgNmEq(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
+                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
                 .fetch();
     }
 
     @Override
     public List<OrganizerFindDto> findOrganizerByParam(OrganizerFindParamDto dto) {
+        QOrganization children = new QOrganization("children");
+
         List<Tuple> fetch = queryFactory
-                .select(employee.empNo, employee.empNm, organization.orgNm, organization.orgNo)
-                .from(employee)
-                .join(employee.organization, organization)
-                .where(orgNmEq(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
+                .select(organization, organization.employees, organization.children)
+                .distinct()
+                .from(organization).join(organization.employees, employee).fetchJoin()
+                .leftJoin(organization.children, children).fetchJoin()
+                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
                 .fetch();
 
         return fetch.stream()
                 .map(f -> OrganizerFindDto.builder()
-                        .empNo(f.get(employee.empNo))
-                        .empNm(f.get(employee.empNm))
-                        .orgNm(f.get(organization.orgNm))
-                        .orgNo(f.get(organization.orgNo))
+                        .organization(f.get(organization))
                         .build())
                 .collect(Collectors.toList());
     }
 
-    private BooleanExpression orgNmEq(String orgNm) {
-        return orgNm == null ? null : organization.orgNm.eq(orgNm);
+    private BooleanExpression orgNmContain(String orgNm) {
+        return orgNm == null ? null : organization.orgNm.contains(orgNm);
     }
 
     private BooleanExpression orgNoEq(String orgNo) {
-        return orgNo == null ? null : organization.orgNo.eq(orgNo);
+        return orgNo == null ? organization.orgNo.eq("000001") : organization.orgNo.eq(orgNo); // default 최상위 조직
     }
 
 }

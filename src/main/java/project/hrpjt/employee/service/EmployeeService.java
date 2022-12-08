@@ -32,8 +32,9 @@ public class EmployeeService {
     private final OrganizationRepository organizationRepository;
 
     public Employee save(EmployeeSaveDto param) {
-//        Organization organization = organizationRepository.findById(param.getOrganizationId()).get();
-        Employee employee = dtoToEntity(param);
+        Organization organization = organizationRepository.findById(param.getOrganizationId()).get();
+        Employee employee = dtoToEntity(param, organization);
+        organization.addEmployee(employee);
 
         return employeeRepository.save(employee);
     }
@@ -53,7 +54,7 @@ public class EmployeeService {
                 .map(m -> entityToDto(m))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(collect);
+        return new PageImpl<>(collect, pageable, collect.size());
     }
 
     public void delete(Long employeeId) {
@@ -134,7 +135,7 @@ public class EmployeeService {
                         .build();
     }
 
-    private Employee dtoToEntity(EmployeeSaveDto param) {
+    private Employee dtoToEntity(EmployeeSaveDto param, Organization organization) {
         return Employee.builder()
                 .empNo(param.getEmpNo())
                 .password(encoder.encode(param.getPassword()))
@@ -144,7 +145,7 @@ public class EmployeeService {
                 .kakaoId(param.getKakaoId())
                 .role(param.getRole())
                 .retireDate(param.getRetireDate())
-                .organization(organizationRepository.findById(param.getOrganizationId()).get())
+                .organization(organization)
                 .birthDate(param.getBirthDate())
                 .gender(param.getGender())
                 .build();

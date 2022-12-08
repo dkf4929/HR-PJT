@@ -11,8 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.employee.dto.EmployeeUpdateDto;
 import project.hrpjt.organization.dto.OrganizationFindParamDto;
@@ -37,10 +39,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 public class OrganizationServiceTest {
-    @Autowired MockMvc mockMvc;
-    @Autowired OrganizationService organizationService;
-    @Autowired OrganizationRepository organizationRepository;
-    @Autowired ObjectMapper objectMapper;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    OrganizationService organizationService;
+    @Autowired
+    OrganizationRepository organizationRepository;
+    @Autowired
+    ObjectMapper objectMapper;
 
     AtomicReference<String> cookieValue = new AtomicReference<>("");
 
@@ -152,5 +158,18 @@ public class OrganizationServiceTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .cookie(new Cookie("jwtToken", cookieValue.get())))
                 .andExpect(status().is3xxRedirection()); // 미인증 시 redirect
+    }
+
+    @Test
+    @DisplayName("조직 삭제")
+    void delete() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/organization/delete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("orgId", "4")
+                        .param("page", "1")
+                        .param("size", "10")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .cookie(new Cookie("jwtToken", cookieValue.get())))
+                .andExpect(status().isOk());
     }
 }
