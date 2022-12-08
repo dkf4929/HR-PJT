@@ -34,4 +34,11 @@ public class OrganizationController {
     public Page<OrganizerFindDto> findEmployee(@RequestBody OrganizerFindParamDto param, Pageable pageable) {
         return organizationService.findOrganizerByParam(param, pageable);
     }
+
+//  조직 삭제
+//  해당 조직에 재직중인 사원이 있을 경우 조직 폐쇄 불가.
+    @DeleteMapping("/role_adm/organization/delete")
+    public Page<OrganizationFindDto> delete(Long orgId, Pageable pageable) {
+        return organizationService.delete(orgId, pageable);
+    }
 }

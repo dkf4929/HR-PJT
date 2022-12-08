@@ -10,11 +10,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.employee.entity.Employee;
+import project.hrpjt.employee.repository.EmployeeRepository;
 import project.hrpjt.exception.NoAuthorityException;
+import project.hrpjt.exception.OrgDeleteException;
 import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +25,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class OrganizationService {
     private final OrganizationRepository organizationRepository;
+    private final EmployeeRepository employeeRepository;
 
     public Organization save(OrganizationSaveDto dto) {
         Organization organization = dtoToEntity(dto);
 
         if (dto.getParentOrgId() != null) {
-            Organization parent = organizationRepository.findById(dto.getParentOrgId()).get();
+            Organization parent = organizationRepository.findById(dto.getParentOrgId()).orElseThrow();
             organization.updateParent(parent);
             parent.addChild(organization);
         }
@@ -37,16 +41,11 @@ public class OrganizationService {
 
 
     public Page<OrganizationFindDto> findAll(OrganizationFindParamDto dto, Pageable pageable) {
-        return new PageImpl<>(organizationRepository.findAllOrg(dto).stream()
-                .map(o -> OrganizationFindDto.builder()  // entity -> dto
-                        .parentOrgNm(o.getParent() == null ? null : o.getParent().getOrgNm())
-                        .parentOrgNo(o.getParent() == null ? null : o.getParent().getOrgNo())
-                        .orgNm(o.getOrgNm())
-                        .orgNo(o.getOrgNo())
-                        .childOrgNo(o.getChildren() == null ? null : o.getChildren().stream().map(chi -> chi.getOrgNo()).collect(Collectors.toList()))
-                        .childOrgNm(o.getChildren() == null ? null : o.getChildren().stream().map(chi -> chi.getOrgNm()).collect(Collectors.toList()))
-                        .build())
-                .collect(Collectors.toList())); // dto -> page<dto>
+        List<Organization> orgList = organizationRepository.findAllOrg(dto);
+
+        List<OrganizationFindDto> list = getCollect(orgList);
+
+        return new PageImpl<>(list, pageable, list.size());
     }
 
 
@@ -59,7 +58,27 @@ public class OrganizationService {
             throw new NoAuthorityException("해당 조직에 접근할 수 있는 권한이 없습니다.");
         }
 
-        return new PageImpl<>(organizationRepository.findOrganizerByParam(param));
+        List<OrganizerFindDto> list = organizationRepository.findOrganizerByParam(param);
+
+        return new PageImpl<>(list, pageable, list.size());
+    }
+
+
+    public Page<OrganizationFindDto> delete(Long orgId, Pageable pageable) {
+        Organization organization = organizationRepository.findById(orgId).orElseThrow();
+        Long count = employeeRepository.countInOfficeEmp(organization); // 해당 조직의 재직중인 사원 수 count
+
+        if (count > 0) {
+            throw new OrgDeleteException("해당 조직에 재직중인 사원이 있습니다.");
+        }
+
+        organizationRepository.delete(organization);
+
+        List<Organization> orgList = organizationRepository.findAllOrg(null);
+
+        List<OrganizationFindDto> list = getCollect(orgList);
+
+        return new PageImpl<>(list, pageable, list.size());
     }
 
     private Organization dtoToEntity(OrganizationSaveDto dto) {
@@ -81,5 +100,14 @@ public class OrganizationService {
         } else {
             return true;
         }
+    }
+
+    private List<OrganizationFindDto> getCollect(List<Organization> orgList) {
+        return orgList.stream()
+                .map(o -> OrganizationFindDto.builder()  // entity -> dto
+                        .organization(o)
+
+                        .build())
+                .collect(Collectors.toList());
     }
 }

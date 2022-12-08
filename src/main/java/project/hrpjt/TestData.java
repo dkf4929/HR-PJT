@@ -56,6 +56,24 @@ public class TestData {
 
         organizationService.save(org3);
 
+        OrganizationSaveDto org4 = OrganizationSaveDto.builder()
+                .orgNm("총무 1팀")
+                .orgNo("000005")
+                .startDate(LocalDate.now())
+                .parentOrgId(3L)
+                .build();
+
+        organizationService.save(org4);
+
+        OrganizationSaveDto org5 = OrganizationSaveDto.builder()
+                .orgNm("총무 2팀")
+                .orgNo("000006")
+                .startDate(LocalDate.now())
+                .parentOrgId(3L)
+                .build();
+
+        organizationService.save(org5);
+
         EmployeeSaveDto ceo = EmployeeSaveDto.builder()
                 .empNo("CEO")
                 .birthDate(LocalDate.of(1960, 01, 01))

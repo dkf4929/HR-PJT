@@ -40,9 +40,9 @@ public class WebSecurityConfig {
         http.httpBasic().disable()
                 .authorizeHttpRequests()
                 .antMatchers(whiteList).permitAll() // 인증 허용 경로 설정
-                .antMatchers(adminPath).hasRole("SYS_ADMIN")
-                .antMatchers(leaderPath).hasAnyRole("SYS_ADMIN", "ORG_LEADER")
-                .antMatchers(userPath).hasAnyRole("EMPLOYEE", "SYS_ADMIN", "ORG_LEADER")
+                .antMatchers(adminPath).hasAnyRole("SYS_ADMIN", "CEO")
+                .antMatchers(leaderPath).hasAnyRole("SYS_ADMIN", "ORG_LEADER", "CEO")
+                .antMatchers(userPath).hasAnyRole("EMPLOYEE", "SYS_ADMIN", "ORG_LEADER", "CEO")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class) //jwt 토큰 인증 필터

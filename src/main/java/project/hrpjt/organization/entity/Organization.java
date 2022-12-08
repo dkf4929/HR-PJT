@@ -1,11 +1,14 @@
 package project.hrpjt.organization.entity;
 
 import lombok.*;
+import project.hrpjt.employee.entity.Employee;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,7 +34,10 @@ public class Organization {
     private Organization parent;
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    private List<Organization> children = new ArrayList<>();
+    private Set<Organization> children = new HashSet<>();
+
+    @OneToMany(mappedBy = "organization")
+    private List<Employee> employees = new ArrayList<>();
 
     @Builder
     public Organization(String orgNo, String orgNm, LocalDate startDate, LocalDate endDate) {
@@ -39,6 +45,12 @@ public class Organization {
         this.orgNm = orgNm;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public void addEmployee(Employee... employees) {
+        for (Employee employee : employees) {
+            this.employees.add(employee);
+        }
     }
 
     public void updateParent(Organization parent) {
@@ -49,5 +61,9 @@ public class Organization {
         for (Organization child : childs) {
             this.children.add(child);
         }
+    }
+
+    public Organization getOrganization() {
+        return this;
     }
 }

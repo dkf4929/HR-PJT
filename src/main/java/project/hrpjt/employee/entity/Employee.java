@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
 public class Employee extends SubEntity implements UserDetails {
     @Id
     @GeneratedValue
@@ -55,12 +55,17 @@ public class Employee extends SubEntity implements UserDetails {
     @OneToMany(mappedBy = "employee")
     private List<Family> families = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "org_id")
     private Organization organization;
 
     public void addFamily(Family family) {
         families.add(family);
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     @Builder
