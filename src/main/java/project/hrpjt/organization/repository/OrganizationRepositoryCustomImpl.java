@@ -14,7 +14,7 @@ import project.hrpjt.organization.entity.QOrganization;
 import javax.persistence.EntityManager;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static project.hrpjt.employee.entity.QEmployee.*;
@@ -31,17 +31,34 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
-    public List<Organization> findAllOrg(OrganizationFindParamDto dto) {
+    public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
         QOrganization parent = new QOrganization("parent");
         QOrganization children = new QOrganization("children");  // 패치조인을 위한 객체 생성.
 
-        return queryFactory
-                .select(organization)
+        List<Tuple> organizations = queryFactory
+                .select(organization, organization.children)
                 .distinct()
-                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
-                .from(organization).leftJoin(organization.children, children).fetchJoin()
-                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
+//                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
+                .from(organization).leftJoin(organization.children).fetchJoin()
                 .fetch();
+
+        Set<Organization> child = new HashSet<>();
+        Organization org = null;
+
+        for (int i = 0; i < organizations.size(); i++) {
+            org = organizations.get(i).get(organization);
+            child = organizations.get(i).get(organization).getChildren();
+        }
+
+        Organization finalOrg = org;
+        Set<Organization> finalChild = child;
+
+        return organizations.stream().map(
+                c -> OrganizationFindDto.builder()
+                        .organization(finalOrg)
+                        .childs(finalChild)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
