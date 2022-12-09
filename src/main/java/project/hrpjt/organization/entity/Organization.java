@@ -1,6 +1,7 @@
 package project.hrpjt.organization.entity;
 
 import lombok.*;
+import project.hrpjt.base.SubEntity;
 import project.hrpjt.employee.entity.Employee;
 
 import javax.persistence.*;
@@ -12,8 +13,9 @@ import java.util.Set;
 
 @Entity
 @Getter
+@ToString(of = {"orgNm"})
 @NoArgsConstructor
-public class Organization {
+public class Organization extends SubEntity {
     @Id @GeneratedValue
     @Column(name = "org_id")
     private Long id;
@@ -40,11 +42,12 @@ public class Organization {
     private List<Employee> employees = new ArrayList<>();
 
     @Builder
-    public Organization(String orgNo, String orgNm, LocalDate startDate, LocalDate endDate) {
+    public Organization(String orgNo, String orgNm, LocalDate startDate, LocalDate endDate, Set<Organization> children) {
         this.orgNo = orgNo;
         this.orgNm = orgNm;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.children = children;
     }
 
     public void addEmployee(Employee... employees) {

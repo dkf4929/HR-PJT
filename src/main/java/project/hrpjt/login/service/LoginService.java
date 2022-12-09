@@ -48,6 +48,7 @@ public class LoginService {
         String token = jwtTokenProvider.createToken(param.getEmpNo(), list);
 
         Cookie cookie = new Cookie("jwtToken", token);
+        cookie.setMaxAge(30 * 60 * 1000);
         cookie.setPath("/");
         response.addCookie(cookie);
 

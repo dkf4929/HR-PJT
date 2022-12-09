@@ -10,10 +10,10 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
-        default_batch_fetch_size: 10
+        default_batch_fetch_size: 100
   security:
     user:
       password: 1234

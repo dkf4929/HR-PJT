@@ -41,9 +41,9 @@ public class OrganizationService {
 
 
     public Page<OrganizationFindDto> findAll(OrganizationFindParamDto dto, Pageable pageable) {
-        List<Organization> orgList = organizationRepository.findAllOrg(dto);
+        List<OrganizationFindDto> list = organizationRepository.findAllOrg(dto);
 
-        List<OrganizationFindDto> list = getCollect(orgList);
+//        List<OrganizationFindDto> list = getCollect(orgList);
 
         return new PageImpl<>(list, pageable, list.size());
     }
@@ -74,9 +74,7 @@ public class OrganizationService {
 
         organizationRepository.delete(organization);
 
-        List<Organization> orgList = organizationRepository.findAllOrg(null);
-
-        List<OrganizationFindDto> list = getCollect(orgList);
+        List<OrganizationFindDto> list = organizationRepository.findAllOrg(null);
 
         return new PageImpl<>(list, pageable, list.size());
     }
@@ -102,12 +100,12 @@ public class OrganizationService {
         }
     }
 
-    private List<OrganizationFindDto> getCollect(List<Organization> orgList) {
-        return orgList.stream()
-                .map(o -> OrganizationFindDto.builder()  // entity -> dto
-                        .organization(o)
-
-                        .build())
-                .collect(Collectors.toList());
-    }
+//    private List<OrganizationFindDto> getCollect(List<Organization> orgList) {
+//        return orgList.stream()
+//                .map(o -> OrganizationFindDto.builder()  // entity -> dto
+//                        .organization(o)
+//                        .child(o.getChildren())
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
 }
