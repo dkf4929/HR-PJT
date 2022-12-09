@@ -41,11 +41,9 @@ public class OrganizationService {
 
 
     public Page<OrganizationFindDto> findAll(OrganizationFindParamDto dto, Pageable pageable) {
-        List<Organization> orgList = organizationRepository.findAllOrg(dto);
+        List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(dto);
 
-        List<OrganizationFindDto> list = getCollect(orgList);
-
-        return new PageImpl<>(list, pageable, list.size());
+        return new PageImpl<>(orgList, pageable, orgList.size());
     }
 
 
@@ -74,11 +72,12 @@ public class OrganizationService {
 
         organizationRepository.delete(organization);
 
-        List<Organization> orgList = organizationRepository.findAllOrg(null);
+//        List<Organization> orgList = organizationRepository.findAllOrg(null);
 
-        List<OrganizationFindDto> list = getCollect(orgList);
+//        List<OrganizationFindDto> list = getCollect(orgList);
 
-        return new PageImpl<>(list, pageable, list.size());
+//        return new PageImpl<>(list, pageable, list.size());
+        return null;
     }
 
     private Organization dtoToEntity(OrganizationSaveDto dto) {
