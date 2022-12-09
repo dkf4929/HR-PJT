@@ -92,6 +92,7 @@ public class OrganizationServiceTest {
     @DisplayName("조직도 조회")
     void findAll() throws Exception {
         OrganizationFindParamDto dto = OrganizationFindParamDto.builder()
+                .orgNm("총무부")
                 .build();
 
         String value = objectMapper.writeValueAsString(dto);

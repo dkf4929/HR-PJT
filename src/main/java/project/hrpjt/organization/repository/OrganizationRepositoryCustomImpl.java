@@ -1,9 +1,7 @@
 package project.hrpjt.organization.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import project.hrpjt.organization.dto.OrganizationFindDto;
@@ -16,8 +14,7 @@ import project.hrpjt.organization.entity.QOrganization;
 import javax.persistence.EntityManager;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static project.hrpjt.employee.entity.QEmployee.*;
@@ -34,33 +31,34 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
-    public List<Organization> findAllOrg(OrganizationFindParamDto dto) {
-        QOrganization sub = new QOrganization("sub");
-        QOrganization children = new QOrganization("children");
+    public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
+        QOrganization parent = new QOrganization("parent");
+        QOrganization children = new QOrganization("children");  // 패치조인을 위한 객체 생성.
 
-        List<Tuple> fetch = queryFactory
-                .select(organization,
-                        organization.parent
-                )
+        List<Tuple> organizations = queryFactory
+                .select(organization, organization.children)
                 .distinct()
 //                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
-                .from(organization).leftJoin(organization.children, children).fetchJoin()
-//                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
-                .where(organization.parent.isNotNull())
+                .from(organization).leftJoin(organization.children).fetchJoin()
                 .fetch();
 
-        fetch.stream().forEach(c -> System.out.println("organization : " + c.get(organization) + " parent : " + c.get(organization.parent)));
+        Set<Organization> child = new HashSet<>();
+        Organization org = null;
 
-        Map<Organization, List<Tuple>> collect = fetch.stream()
-                .collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
+        for (int i = 0; i < organizations.size(); i++) {
+            org = organizations.get(i).get(organization);
+            child = organizations.get(i).get(organization).getChildren();
+        }
 
+        Organization finalOrg = org;
+        Set<Organization> finalChild = child;
 
-        collect.entrySet().stream()
-                .forEach(
-                        e -> System.out.println("parent : " + e.getKey() + " child : " + collect.get((e.getKey())))
-                );
-
-        return null;
+        return organizations.stream().map(
+                c -> OrganizationFindDto.builder()
+                        .organization(finalOrg)
+                        .childs(finalChild)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
