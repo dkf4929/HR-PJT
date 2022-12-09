@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static project.hrpjt.employee.entity.QEmployee.*;
@@ -34,7 +35,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
-    public List<Organization> findAllOrg(OrganizationFindParamDto dto) {
+    public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
         QOrganization sub = new QOrganization("sub");
         QOrganization children = new QOrganization("children");
 
@@ -46,21 +47,23 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 //                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
                 .from(organization).leftJoin(organization.children, children).fetchJoin()
 //                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
-                .where(organization.parent.isNotNull())
+//                .where(organization.parent.isNotNull())
+                .orderBy(organization.orgNo.asc().nullsFirst())
                 .fetch();
 
-        fetch.stream().forEach(c -> System.out.println("organization : " + c.get(organization) + " parent : " + c.get(organization.parent)));
+        Map<Organization, List<Tuple>> collect = fetch.stream().collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
 
-        Map<Organization, List<Tuple>> collect = fetch.stream()
-                .collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
+        Set<Organization> childSet = collect.values().stream()
+                .flatMap(tuples -> tuples.stream()
+                        .map(tuple -> tuple.get(organization)))
+                .collect(Collectors.toSet());
 
-
-        collect.entrySet().stream()
-                .forEach(
-                        e -> System.out.println("parent : " + e.getKey() + " child : " + collect.get((e.getKey())))
-                );
-
-        return null;
+        return collect.entrySet().stream()
+                .map(objectListEntry -> OrganizationFindDto.builder()
+                        .organization(objectListEntry.getKey())
+                        .childs(childSet)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
