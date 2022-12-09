@@ -10,7 +10,7 @@ import project.hrpjt.organization.entity.Organization;
 import java.util.List;
 
 public interface OrganizationRepositoryCustom {
-    public List<Organization> findAllOrg(OrganizationFindParamDto dto);
+    public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto);
 
     public List<OrganizerFindDto> findOrganizerByParam(OrganizerFindParamDto dto);
 }
