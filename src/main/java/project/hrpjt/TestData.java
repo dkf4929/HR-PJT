@@ -56,6 +56,15 @@ public class TestData {
 
         organizationService.save(org3);
 
+        OrganizationSaveDto o = OrganizationSaveDto.builder()
+                .orgNm("인사 1-1팀")
+                .orgNo("000008")
+                .startDate(LocalDate.now())
+                .parentOrgId(4L)
+                .build();
+
+        organizationService.save(o);
+
         OrganizationSaveDto org4 = OrganizationSaveDto.builder()
                 .orgNm("총무 1팀")
                 .orgNo("000005")

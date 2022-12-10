@@ -101,12 +101,12 @@ public class OrganizationService {
         }
     }
 
-    private List<OrganizationFindDto> getCollect(List<Organization> orgList) {
-        return orgList.stream()
-                .map(o -> OrganizationFindDto.builder()  // entity -> dto
-                        .organization(o)
-
-                        .build())
-                .collect(Collectors.toList());
-    }
+//    private List<OrganizationFindDto> getCollect(List<Organization> orgList) {
+//        return orgList.stream()
+//                .map(o -> OrganizationFindDto.builder()  // entity -> dto
+//                        .organization(o)
+//
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
 }

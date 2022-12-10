@@ -13,8 +13,8 @@ import java.util.Set;
 
 @Entity
 @Getter
-@ToString(of = {"orgNm"})
 @NoArgsConstructor
+@ToString(of = {"orgNo", "orgNm"})
 public class Organization extends SubEntity {
     @Id @GeneratedValue
     @Column(name = "org_id")

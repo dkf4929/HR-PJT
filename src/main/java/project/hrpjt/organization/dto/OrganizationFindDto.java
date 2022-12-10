@@ -1,5 +1,6 @@
 package project.hrpjt.organization.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 import project.hrpjt.organization.entity.Organization;
 
@@ -9,19 +10,21 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Getter
-@ToString(of = {"orgNo", "orgNm"})
 public class OrganizationFindDto {
     private String orgNo;
     private String orgNm;
-    private List<OrganizationFindDto> child = new ArrayList<>();
-
+    private Set<OrganizationFindDto> child = new HashSet<>();
 
     @Builder
     public OrganizationFindDto(Organization organization, Set<Organization> childs) {
         this.orgNo = organization.getOrgNo();
         this.orgNm = organization.getOrgNm();
-        for (Organization child : childs) {
-            this.child.add(OrganizationFindDto.builder().childs(child.getChildren()).organization(child).build());
-        }
+        this.child = childs.stream().map(o -> OrganizationFindDto.builder()
+                .organization(o)
+                .childs(childs).build())
+                .collect(Collectors.toSet());
+
+//        this.child = childs.stream().map(o -> OrganizationFindDto.builder().organization(o).childs(o.getChildren()).build()).collect(Collectors.toSet());
+
     }
 }

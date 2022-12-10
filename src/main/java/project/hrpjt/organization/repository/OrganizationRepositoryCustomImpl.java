@@ -6,10 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import project.hrpjt.organization.dto.OrganizationFindDto;
-import project.hrpjt.organization.dto.OrganizationFindParamDto;
-import project.hrpjt.organization.dto.OrganizerFindDto;
-import project.hrpjt.organization.dto.OrganizerFindParamDto;
+import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.entity.QOrganization;
 
@@ -23,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static project.hrpjt.employee.entity.QEmployee.*;
 import static project.hrpjt.organization.entity.QOrganization.*;
+import static project.hrpjt.organization.entity.QOrganization.organization;
 
 public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryCustom {
     private final EntityManager entityManager;
@@ -47,26 +45,30 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 //                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
                 .from(organization).leftJoin(organization.children, children).fetchJoin()
 //                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
+//                .where(organization.children.isEmpty())
                 .orderBy(organization.orgNo.asc().nullsFirst())
                 .fetch();
 
+        Map<Organization, List<Tuple>> collect = fetch.stream().distinct()
+                .collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
 
-        Map<Organization, List<Tuple>> collect = fetch.stream().collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
+        System.out.println("collect = " + collect);
 
-//        return collect.entrySet().stream()
-//                .distinct()
-//                .map(entry -> OrganizationFindDto.builder()
-//                        .childs(entry.getValue().stream().distinct()
-//                                .map(tuple -> tuple.get(organization)).collect(Collectors.toSet()))
-//                        .organization(entry.getKey())
-//                        .build())
-//                .collect(Collectors.toList());
+
+//        for (Organization entry : collect.keySet()) {
+//            Map<Organization, List<Organization>> col = collect.get(entry).stream().map(c -> c.get(organization)).collect(Collectors.toSet())
+//                    .stream().collect(Collectors.groupingBy(c -> entry));
+//
+//            System.out.println("col = " + col);
+//        }
 
         return collect.keySet().stream()
                 .distinct()
                 .map(entry -> OrganizationFindDto.builder()
-                        .childs(collect.get(entry).stream().distinct()
-                                .map(c -> c.get(organization)).collect(Collectors.toSet()))
+                        .childs(collect.get(entry).stream()
+                                .map(c -> c.get(organization)).collect(Collectors.toSet())
+                                .stream().collect(Collectors.groupingBy(c -> c))
+                                .values().stream().map(s -> s.iterator().next()).collect(Collectors.toSet()))
                         .organization(entry)
                         .build())
                 .collect(Collectors.toList());
