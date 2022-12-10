@@ -41,9 +41,7 @@ public class OrganizationService {
 
 
     public Page<OrganizationFindDto> findAll(OrganizationFindParamDto dto, Pageable pageable) {
-        List<Organization> orgList = organizationRepository.findAllOrg(dto);
-
-        List<OrganizationFindDto> list = getCollect(orgList);
+        List<OrganizationFindDto> list = organizationRepository.findAllOrg(dto);
 
         return new PageImpl<>(list, pageable, list.size());
     }
@@ -72,13 +70,14 @@ public class OrganizationService {
             throw new OrgDeleteException("해당 조직에 재직중인 사원이 있습니다.");
         }
 
-        organizationRepository.delete(organization);
+//        organizationRepository.delete(organization);
+//
+//        List<Organization> orgList = organizationRepository.findAllOrg(null);
+//
+//        List<OrganizationFindDto> list = getCollect(orgList);
 
-        List<Organization> orgList = organizationRepository.findAllOrg(null);
-
-        List<OrganizationFindDto> list = getCollect(orgList);
-
-        return new PageImpl<>(list, pageable, list.size());
+        return null;
+//        return new PageImpl<>(list, pageable, list.size());
     }
 
     private Organization dtoToEntity(OrganizationSaveDto dto) {

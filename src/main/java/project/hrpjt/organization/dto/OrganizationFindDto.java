@@ -1,26 +1,27 @@
 package project.hrpjt.organization.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import project.hrpjt.organization.entity.Organization;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Getter
+@ToString(of = {"orgNo", "orgNm"})
 public class OrganizationFindDto {
     private String orgNo;
     private String orgNm;
-    private List<OrganizationFindDto> child;
+    private List<OrganizationFindDto> child = new ArrayList<>();
+
 
     @Builder
-    public OrganizationFindDto(Organization organization) {
+    public OrganizationFindDto(Organization organization, Set<Organization> childs) {
         this.orgNo = organization.getOrgNo();
         this.orgNm = organization.getOrgNm();
-        this.child = organization.getChildren().stream().map(OrganizationFindDto::new).collect(Collectors.toList());
+        for (Organization child : childs) {
+            this.child.add(OrganizationFindDto.builder().childs(child.getChildren()).organization(child).build());
+        }
     }
 }
