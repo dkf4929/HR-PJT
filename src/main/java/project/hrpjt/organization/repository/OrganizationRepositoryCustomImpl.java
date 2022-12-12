@@ -13,10 +13,7 @@ import project.hrpjt.organization.entity.QOrganization;
 import javax.persistence.EntityManager;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static project.hrpjt.employee.entity.QEmployee.*;
@@ -44,30 +41,12 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 .distinct()
 //                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
                 .from(organization)//.leftJoin(organization.parent, parent).fetchJoin()
-                .orderBy(organization.orgNo.asc().nullsFirst())
+                .orderBy(organization.parent.orgNo.desc().nullsFirst())
                 .fetch();
 
         Map<Organization, List<Tuple>> collect = fetch.stream().distinct()
                 .collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
 
-//        List<OrganizationFindDto> list = new ArrayList<>();
-//
-//
-//        for (int i = 0; i < collect.keySet().size(); i++) {
-//            OrganizationFindDto build = OrganizationFindDto.builder()
-//                    .childs(collect.get(collect.keySet().iterator().next()).stream()
-//                            .map(c -> c.get(organization)).collect(Collectors.toSet())
-//                            .stream().collect(Collectors.groupingBy(c -> c))
-//                            .values().stream().map(s -> s.iterator().next()).collect(Collectors.toSet()))
-//                    .organization(collect.keySet().iterator().next())
-//                    .build();
-//
-//            build.setParent(build);
-//
-//            list.add(build);
-//        }
-//
-//        return list;
         return collect.keySet().stream()
                 .distinct()
                 .map(entry -> OrganizationFindDto.builder()
@@ -75,8 +54,9 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                                 .map(c -> c.get(organization)).collect(Collectors.toSet())
                                 .stream().collect(Collectors.groupingBy(c -> c))
                                 .values().stream().map(s -> s.iterator().next()).collect(Collectors.toSet()))
-                        .organization(entry.getOrganization())
+                        .organization(entry)
                         .build())
+                .sorted(Comparator.comparing(OrganizationFindDto::getOrgNo))
                 .collect(Collectors.toList());
     }
 
