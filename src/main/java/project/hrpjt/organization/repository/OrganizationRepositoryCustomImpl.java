@@ -13,6 +13,7 @@ import project.hrpjt.organization.entity.QOrganization;
 import javax.persistence.EntityManager;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,8 +35,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 
     @Override
     public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
-        QOrganization sub = new QOrganization("sub");
-        QOrganization children = new QOrganization("children");
+        QOrganization parent = new QOrganization("parent");
 
         List<Tuple> fetch = queryFactory
                 .select(organization,
@@ -43,25 +43,31 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 )
                 .distinct()
 //                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
-                .from(organization).leftJoin(organization.children, children).fetchJoin()
-//                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
-//                .where(organization.children.isEmpty())
+                .from(organization)//.leftJoin(organization.parent, parent).fetchJoin()
                 .orderBy(organization.orgNo.asc().nullsFirst())
                 .fetch();
 
         Map<Organization, List<Tuple>> collect = fetch.stream().distinct()
                 .collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
 
-        System.out.println("collect = " + collect);
-
-
-//        for (Organization entry : collect.keySet()) {
-//            Map<Organization, List<Organization>> col = collect.get(entry).stream().map(c -> c.get(organization)).collect(Collectors.toSet())
-//                    .stream().collect(Collectors.groupingBy(c -> entry));
+//        List<OrganizationFindDto> list = new ArrayList<>();
 //
-//            System.out.println("col = " + col);
+//
+//        for (int i = 0; i < collect.keySet().size(); i++) {
+//            OrganizationFindDto build = OrganizationFindDto.builder()
+//                    .childs(collect.get(collect.keySet().iterator().next()).stream()
+//                            .map(c -> c.get(organization)).collect(Collectors.toSet())
+//                            .stream().collect(Collectors.groupingBy(c -> c))
+//                            .values().stream().map(s -> s.iterator().next()).collect(Collectors.toSet()))
+//                    .organization(collect.keySet().iterator().next())
+//                    .build();
+//
+//            build.setParent(build);
+//
+//            list.add(build);
 //        }
-
+//
+//        return list;
         return collect.keySet().stream()
                 .distinct()
                 .map(entry -> OrganizationFindDto.builder()
@@ -69,7 +75,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                                 .map(c -> c.get(organization)).collect(Collectors.toSet())
                                 .stream().collect(Collectors.groupingBy(c -> c))
                                 .values().stream().map(s -> s.iterator().next()).collect(Collectors.toSet()))
-                        .organization(entry)
+                        .organization(entry.getOrganization())
                         .build())
                 .collect(Collectors.toList());
     }
