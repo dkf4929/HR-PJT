@@ -4,21 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.employee.repository.EmployeeRepository;
-import project.hrpjt.exception.NoAuthorityException;
 import project.hrpjt.exception.OrgDeleteException;
 import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +27,20 @@ public class OrganizationService {
 
         if (dto.getParentOrgId() != null) {
             Organization parent = organizationRepository.findById(dto.getParentOrgId()).orElseThrow();
+
             organization.updateParent(parent);
-            parent.addChild(organization);
+//            parent.addChild(organization);
+
+            if (dto.getChildOrgId() != null) {
+                List<Organization> child = organizationRepository.findAllById(dto.getChildOrgId());
+
+                for (Organization org : child) {
+                    org.updateParent(organization);
+//                    organization.addChild(org);
+                    System.out.println("org = " + org);
+                    System.out.println("org.parent = " + org.getParent());
+                }
+            }
         }
 
         return organizationRepository.save(organization);
@@ -47,37 +54,29 @@ public class OrganizationService {
     }
 
 
-    public Page<OrganizerFindDto> findOrganizerByParam(OrganizerFindParamDto param, Pageable pageable) {
-        Employee loginEmp = (Employee) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); //권한 확인을 위해 로그인한 사용자 추출
+    public Page<OrganizerFindDto> findOrganizerByParam(Pageable pageable) {
+//        Employee loginEmp = (Employee) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); //권한 확인을 위해 로그인한 사용자 추출
+//
+//        boolean authYn = authCheck(loginEmp, param);
+//
+//        if (!authYn) {
+//            throw new NoAuthorityException("해당 조직에 접근할 수 있는 권한이 없습니다.");
+//        }
 
-        boolean authYn = authCheck(loginEmp, param);
-
-        if (!authYn) {
-            throw new NoAuthorityException("해당 조직에 접근할 수 있는 권한이 없습니다.");
-        }
-
-        List<OrganizerFindDto> list = organizationRepository.findOrganizerByParam(param);
+        List<OrganizerFindDto> list = organizationRepository.findOrganizerByParam();
 
         return new PageImpl<>(list, pageable, list.size());
     }
 
 
-    public Page<OrganizationFindDto> delete(Long orgId, Pageable pageable) {
+    public Page<OrganizationFindDto> close(Long orgId, Pageable pageable) {
         Organization organization = organizationRepository.findById(orgId).orElseThrow();
-        Long count = employeeRepository.countInOfficeEmp(organization); // 해당 조직의 재직중인 사원 수 count
 
-        if (count > 0) {
-            throw new OrgDeleteException("해당 조직에 재직중인 사원이 있습니다.");
-        }
+        organizationRepository.delete(organization);
 
-//        organizationRepository.delete(organization);
-//
-//        List<Organization> orgList = organizationRepository.findAllOrg(null);
-//
-//        List<OrganizationFindDto> list = getCollect(orgList);
+        List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(null);
 
-        return null;
-//        return new PageImpl<>(list, pageable, list.size());
+        return new PageImpl<>(orgList, pageable, orgList.size());
     }
 
     private Organization dtoToEntity(OrganizationSaveDto dto) {
@@ -100,13 +99,4 @@ public class OrganizationService {
             return true;
         }
     }
-
-//    private List<OrganizationFindDto> getCollect(List<Organization> orgList) {
-//        return orgList.stream()
-//                .map(o -> OrganizationFindDto.builder()  // entity -> dto
-//                        .organization(o)
-//
-//                        .build())
-//                .collect(Collectors.toList());
-//    }
 }
