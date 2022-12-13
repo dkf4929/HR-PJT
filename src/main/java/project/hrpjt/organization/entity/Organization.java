@@ -35,8 +35,8 @@ public class Organization extends SubEntity {
     @JoinColumn(name = "parent_id")
     private Organization parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    private Set<Organization> children = new HashSet<>();
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private Set<Organization> children;
 
     @OneToMany(mappedBy = "organization")
     private List<Employee> employees = new ArrayList<>();
@@ -60,10 +60,9 @@ public class Organization extends SubEntity {
         this.parent = parent;
     }
 
-    public void addChild(Organization... childs) {
-        for (Organization child : childs) {
-            this.children.add(child);
-        }
+    public void addChild(Organization child) {
+        children = new HashSet<>();
+        this.children.add(child);
     }
 
     public Organization getOrganization() {

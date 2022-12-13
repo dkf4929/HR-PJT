@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,9 @@ import project.hrpjt.organization.service.OrganizationService;
 import javax.servlet.http.Cookie;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -67,25 +70,25 @@ public class OrganizationServiceTest {
 
     @Test
     void save() {
-        OrganizationSaveDto company = OrganizationSaveDto.builder()
-                .orgNm("company")
-                .orgNo("000001")
+        List<Long> ids = new ArrayList<>();
+
+        ids.add(6L);
+        ids.add(7L);
+
+        OrganizationSaveDto hbm = OrganizationSaveDto.builder()
+                .orgNm("복리후생")
+                .parentOrgId(3L)
+                .orgNo("000021")
+                .childOrgId(ids)
                 .startDate(LocalDate.now())
                 .build();
 
-        organizationService.save(company);
+        Organization hbmOrg = organizationService.save(hbm);
+        Organization organization1 = organizationRepository.findById(6L).get();
+        Organization organization2 = organizationRepository.findById(7L).get();
 
-        OrganizationSaveDto org = OrganizationSaveDto.builder()
-                .orgNm("인사부")
-                .orgNo("000002")
-                .startDate(LocalDate.now())
-                .parentOrgId(1L)
-                .build();
-
-        organizationService.save(org);
-
-        Organization organization = organizationRepository.findById(1L).get();
-
+        Assertions.assertThat(organization1.getParent()).isEqualTo(hbmOrg);
+        Assertions.assertThat(organization2.getParent()).isEqualTo(hbmOrg);
     }
 
     @Test
@@ -163,13 +166,13 @@ public class OrganizationServiceTest {
     @Test
     @DisplayName("조직 삭제")
     void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/organization/delete")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/organization")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("orgId", "4")
                         .param("page", "1")
                         .param("size", "10")
                         .accept(MediaType.APPLICATION_JSON)
                         .cookie(new Cookie("jwtToken", cookieValue.get())))
-                .andExpect(status().isOk());
+                .andExpect(status().is5xxServerError());
     }
 }

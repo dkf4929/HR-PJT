@@ -1,23 +1,20 @@
 package project.hrpjt.organization.repository;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.core.types.dsl.DateExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
-import project.hrpjt.organization.entity.QOrganization;
 
 import javax.persistence.EntityManager;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static project.hrpjt.employee.entity.QEmployee.*;
-import static project.hrpjt.organization.entity.QOrganization.*;
 import static project.hrpjt.organization.entity.QOrganization.organization;
 
 public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryCustom {
@@ -32,51 +29,81 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 
     @Override
     public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
-        QOrganization parent = new QOrganization("parent");
+//        String date1 = organization.startDate.toString();
+//        String date2 = organization.endDate.toString();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-        List<Tuple> fetch = queryFactory
-                .select(organization,
-                        organization.parent
-                )
-                .distinct()
-//                .from(organization).leftJoin(organization.parent, parent).fetchJoin()
-                .from(organization)//.leftJoin(organization.parent, parent).fetchJoin()
-                .orderBy(organization.parent.orgNo.desc().nullsFirst())
-                .fetch();
+        try {
+            Date startDate = dateFormat.parse(date1);
+            Date endDate = dateFormat.parse(date2);
 
-        Map<Organization, List<Tuple>> collect = fetch.stream().distinct()
-                .collect(Collectors.groupingBy(tuple -> tuple.get(organization.parent)));
+            List<Organization> organizationList = queryFactory
+                    .selectFrom(organization)
+                    .leftJoin(organization.parent).fetchJoin()
+                    .leftJoin(organization.children).fetchJoin()
+                    .where(Expressions.currentTimestamp().between(startDate, endDate))
+                    .orderBy(organization.orgNo.asc())
+                    .fetch();
 
-        return collect.keySet().stream()
-                .distinct()
-                .map(entry -> OrganizationFindDto.builder()
-                        .childs(collect.get(entry).stream()
-                                .map(c -> c.get(organization)).collect(Collectors.toSet())
-                                .stream().collect(Collectors.groupingBy(c -> c))
-                                .values().stream().map(s -> s.iterator().next()).collect(Collectors.toSet()))
-                        .organization(entry)
-                        .build())
-                .sorted(Comparator.comparing(OrganizationFindDto::getOrgNo))
-                .collect(Collectors.toList());
+            List<OrganizationFindDto> dtoList = new ArrayList<>();
+            Map<Long, OrganizationFindDto> map = new HashMap<>();
+
+            organizationList.stream()
+                    .forEach(o -> {
+                        OrganizationFindDto organizationFindDto = new OrganizationFindDto(o);
+
+                        if (o.getParent() != null) {
+                            organizationFindDto.setParentId(o.getParent().getId());
+                        }
+
+                        System.out.println("organizationFindDto = " + organizationFindDto);
+
+                        map.put(organizationFindDto.getId(), organizationFindDto);
+
+                        if (o.getParent() != null) {
+                            map.get(o.getParent().getId()).getChild().add(organizationFindDto);
+                        } else {
+                            dtoList.add(organizationFindDto);
+                        }
+                    });
+
+            return dtoList;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public List<OrganizerFindDto> findOrganizerByParam(OrganizerFindParamDto dto) {
-        QOrganization children = new QOrganization("children");
-
-        List<Tuple> fetch = queryFactory
-                .select(organization, organization.employees, organization.children)
+    public List<OrganizerFindDto> findOrganizerByParam() {
+        List<Organization> list = queryFactory
+                .selectFrom(organization)
                 .distinct()
-                .from(organization).join(organization.employees, employee).fetchJoin()
-                .leftJoin(organization.children, children).fetchJoin()
-                .where(orgNmContain(dto.getOrgNm()), orgNoEq(dto.getOrgNo()))
+                .leftJoin(organization.parent).fetchJoin()
+                .leftJoin(organization.employees, employee).fetchJoin()
+//                .where(dto.getOrgNo() == null ? null : organization.orgNo.ne("000001"))
+//                .orderBy(organization.parent.orgNo.asc().nullsFirst())
                 .fetch();
 
-        return fetch.stream()
-                .map(f -> OrganizerFindDto.builder()
-                        .organization(f.get(organization))
-                        .build())
-                .collect(Collectors.toList());
+        List<OrganizerFindDto> dtoList = new ArrayList<>();
+        Map<Long, OrganizerFindDto> map = new HashMap<>();
+
+        list.stream().forEach(o -> {
+            OrganizerFindDto dto = new OrganizerFindDto(o);
+
+            if (o.getParent() != null) {
+                dto.setParentId(o.getParent().getId());
+            }
+
+            map.put(dto.getId(), dto);
+
+            if (o.getParent() != null) {
+                map.get(o.getParent().getId()).getChild().add(dto);
+            } else {
+                dtoList.add(dto);
+            }
+        });
+
+        return dtoList;
     }
 
     private BooleanExpression orgNmContain(String orgNm) {

@@ -23,14 +23,14 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @ResponseBody
-    @PostMapping("role_adm/employees/add") //회원 저장
+    @PostMapping("role_adm/employees") //회원 저장
     public String save(@Valid EmployeeSaveDto param) {
         employeeService.save(param);
         return "저장완료";
     }
 
     @ResponseBody
-    @GetMapping("role_emp/employees/mypage")
+    @GetMapping("role_emp/employees/")
     public EmployeeFindDto findEmployee() {
         project.hrpjt.employee.entity.Employee employee = (project.hrpjt.employee.entity.Employee) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); //로그인한 사용자 가져오기
         return employeeService.findEmployee(employee.getId());
@@ -44,7 +44,7 @@ public class EmployeeController {
 
     // 시스템 관리자는 삭제 불가.
     @ResponseBody
-    @DeleteMapping("/role_adm/employees/delete") //회원 삭제
+    @DeleteMapping("/role_adm/employees") //회원 삭제
     public String deleteEmployee(Long employeeId) {
         employeeService.delete(employeeId);
         return "삭제 되었습니다.";
@@ -56,7 +56,7 @@ public class EmployeeController {
 //     3. 변경 가능한 권한 항목 -> sys_admin(org_leader 권한 부여 가능), ceo(sys_admin 권한 부여 가능)
 //     4. 개인 정보는 해당 사원의 부서장 또는 시스템 관리자가 변경 가능. 사번, 성명, 조직은 시스템 관리자만 변경 가능.
     @ResponseBody
-    @PutMapping("/role_emp/employees/edit")
+    @PutMapping("/role_emp/employees")
     public EmployeeFindDto editInfo(@RequestBody EmployeeUpdateDto param) {
         return employeeService.edit(param);
     }
