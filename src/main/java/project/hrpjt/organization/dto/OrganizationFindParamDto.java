@@ -12,6 +12,5 @@ import java.util.List;
 @Getter
 @Builder
 public class OrganizationFindParamDto {
-    private String orgNo;
-    private String orgNm;
+    private Long orgId;
 }

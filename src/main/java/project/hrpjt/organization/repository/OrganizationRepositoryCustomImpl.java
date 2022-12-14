@@ -31,35 +31,39 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 
     @Override
     public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
-            List<Organization> organizationList = entityManager.createQuery("select o from Organization o" +
-                            " left join fetch o.parent p" +
-                            " where :current between o.startDate and o.endDate" +
-                            " order by o.orgNo asc", Organization.class).setParameter("current", LocalDate.now())
-                    .getResultList();
+//            List<Organization> organizationList = entityManager.createQuery("select o from Organization o" +
+//                            " left join fetch o.parent p" +
+//                            " where :current between o.startDate and o.endDate" +
+//                            " order by o.orgNo asc", Organization.class).setParameter("current", LocalDate.now())
+//                    .getResultList();
 
-            List<OrganizationFindDto> dtoList = new ArrayList<>();
-            Map<Long, OrganizationFindDto> map = new HashMap<>();
+        System.out.println("dto.getOrgId() = " + dto.getOrgId());
+
+        List<Organization> organizationList = entityManager.createNativeQuery(
+                getSqlString(), Organization.class).setParameter("org_id", dto.getOrgId()).getResultList();
+
+        List<OrganizationFindDto> dtoList = new ArrayList<>();
+        Map<Long, OrganizationFindDto> map = new HashMap<>();
+
+        organizationList.stream()
+                .forEach(o -> {
+                    OrganizationFindDto organizationFindDto = new OrganizationFindDto(o);
+
+                    if (o.getParent() != null) {
+                        organizationFindDto.setParentId(o.getParent().getId());
+                    }
+
+                    map.put(organizationFindDto.getId(), organizationFindDto);
 
 
-            organizationList.stream()
-                    .forEach(o -> {
-                        OrganizationFindDto organizationFindDto = new OrganizationFindDto(o);
+                    if (o.getParent() != null  && map.size() > 1) { // 첫번째 요소인지 판별
+                        map.get(o.getParent().getId()).getChild().add(organizationFindDto);
+                    } else {
+                        dtoList.add(organizationFindDto);
+                    }
+                });
 
-                        if (o.getParent() != null) {
-                            organizationFindDto.setParentId(o.getParent().getId());
-                        }
-
-                        map.put(organizationFindDto.getId(), organizationFindDto);
-
-
-                        if (o.getParent() != null) {
-                            map.get(o.getParent().getId()).getChild().add(organizationFindDto);
-                        } else {
-                            dtoList.add(organizationFindDto);
-                        }
-                    });
-
-            return dtoList;
+        return dtoList;
     }
 
     @Override
@@ -114,7 +118,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 "             end_date," +
                 "             org_no" +
                 "  from       organization" +
-                "  where      parent_id = :org_id" +
+                "  where      parent_id = case when :org_id is null then 1 else :org_id end" +
                 "  union all" +
                 "  select     d.org_id," +
                 "              d.org_nm," +
@@ -130,8 +134,6 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 "  inner join cte" +
                 "          on d.parent_id= cte.org_id" +
                 ")" +
-                "select * from cte" +
-                " union all" +
                 "  select     org_id," +
                 "              org_nm," +
                 "             parent_id," +
@@ -143,7 +145,9 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 "             end_date," +
                 "             org_no" +
                 "  from       organization" +
-                "  where      org_id = :org_id";
+                "  where      org_id = case when :org_id is null then 1 else :org_id end" +
+                " union all" +
+                " select * from cte";
     }
 
     private BooleanExpression orgNmContain(String orgNm) {
