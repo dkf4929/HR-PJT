@@ -69,6 +69,7 @@ public class OrganizationServiceTest {
     }
 
     @Test
+    @Commit
     void save() {
         List<Long> ids = new ArrayList<>();
 
