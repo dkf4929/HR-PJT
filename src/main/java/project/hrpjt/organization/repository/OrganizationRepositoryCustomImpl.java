@@ -37,8 +37,6 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 //                            " order by o.orgNo asc", Organization.class).setParameter("current", LocalDate.now())
 //                    .getResultList();
 
-        System.out.println("dto.getOrgId() = " + dto.getOrgId());
-
         List<Organization> organizationList = entityManager.createNativeQuery(
                 getSqlString(), Organization.class).setParameter("org_id", dto.getOrgId()).getResultList();
 
@@ -119,6 +117,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 "             org_no" +
                 "  from       organization" +
                 "  where      parent_id = case when :org_id is null then 1 else :org_id end" +
+                "  and        sysdate() between start_date and end_date" +
                 "  union all" +
                 "  select     d.org_id," +
                 "              d.org_nm," +

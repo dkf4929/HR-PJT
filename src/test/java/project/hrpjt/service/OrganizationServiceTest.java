@@ -65,7 +65,6 @@ public class OrganizationServiceTest {
                 .andDo(result -> Arrays.stream(result.getResponse().getCookies())
                         .filter((c) -> c.getName().equals("jwtToken"))
                         .forEach((c) -> cookieValue.set(c.getValue())));   // result에서 쿠키값 추출
-        System.out.println("-------------------each-------------------");
     }
 
     @Test
@@ -96,7 +95,7 @@ public class OrganizationServiceTest {
     @DisplayName("조직도 조회")
     void findAll() throws Exception {
         OrganizationFindParamDto dto = OrganizationFindParamDto.builder()
-                .orgNm("총무부")
+                .orgId(3L)
                 .build();
 
         String value = objectMapper.writeValueAsString(dto);
