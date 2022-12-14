@@ -37,9 +37,6 @@ public class OrganizationService {
 
                 for (Organization org : child) {
                     org.updateParent(organization);
-//                    organization.addChild(org);
-                    System.out.println("org = " + org);
-                    System.out.println("org.parent = " + org.getParent());
                 }
             }
         }
@@ -70,16 +67,16 @@ public class OrganizationService {
     }
 
 
-    public Page<OrganizationFindDto> close(Long orgId, Pageable pageable) {
+    public Page<OrganizationFindDto> close(OrganizationFindParamDto dto, Pageable pageable) {
 //        Organization organization = organizationRepository.findById(orgId).orElseThrow();
 
-        List<Organization> allChild = organizationRepository.findAllChild(orgId);
+        List<Organization> allChild = organizationRepository.findAllChild(dto.getOrgId());
 
         for (Organization org : allChild) {
-            org.updateEndDate(LocalDate.now().minusDays(1));
+            org.updateEndDate(LocalDate.now().minusDays(1));  // 부모 조직과 하위 조직의 종료일을 오늘 일자 -1일로 업데이트
         }
 
-        List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(null);
+        List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(OrganizationFindParamDto.builder().build());  // 전체 조직도 조회
 
         return new PageImpl<>(orgList, pageable, orgList.size());
     }

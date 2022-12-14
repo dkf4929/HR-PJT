@@ -35,7 +35,7 @@ public class OrganizationController {
 
 //  조직 폐쇄(종료일을 현재일로 update)
     @DeleteMapping("/role_adm/organization")
-    public Page<OrganizationFindDto> close(Long orgId, Pageable pageable) {
-        return organizationService.close(orgId, pageable);
+    public Page<OrganizationFindDto> close(@RequestBody OrganizationFindParamDto dto, Pageable pageable) {
+        return organizationService.close(dto, pageable);
     }
 }
