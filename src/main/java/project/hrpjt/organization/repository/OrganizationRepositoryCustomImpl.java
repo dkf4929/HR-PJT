@@ -3,6 +3,8 @@ package project.hrpjt.organization.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DateExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import project.hrpjt.organization.dto.*;
@@ -29,24 +31,15 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 
     @Override
     public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
-//        String date1 = organization.startDate.toString();
-//        String date2 = organization.endDate.toString();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-        try {
-            Date startDate = dateFormat.parse(date1);
-            Date endDate = dateFormat.parse(date2);
-
-            List<Organization> organizationList = queryFactory
-                    .selectFrom(organization)
-                    .leftJoin(organization.parent).fetchJoin()
-                    .leftJoin(organization.children).fetchJoin()
-                    .where(Expressions.currentTimestamp().between(startDate, endDate))
-                    .orderBy(organization.orgNo.asc())
-                    .fetch();
+            List<Organization> organizationList = entityManager.createQuery("select o from Organization o" +
+                            " left join fetch o.parent p" +
+                            " where :current between o.startDate and o.endDate" +
+                            " order by o.orgNo asc", Organization.class).setParameter("current", LocalDate.now())
+                    .getResultList();
 
             List<OrganizationFindDto> dtoList = new ArrayList<>();
             Map<Long, OrganizationFindDto> map = new HashMap<>();
+
 
             organizationList.stream()
                     .forEach(o -> {
@@ -56,9 +49,8 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                             organizationFindDto.setParentId(o.getParent().getId());
                         }
 
-                        System.out.println("organizationFindDto = " + organizationFindDto);
-
                         map.put(organizationFindDto.getId(), organizationFindDto);
+
 
                         if (o.getParent() != null) {
                             map.get(o.getParent().getId()).getChild().add(organizationFindDto);
@@ -68,9 +60,6 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                     });
 
             return dtoList;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -104,6 +93,57 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
         });
 
         return dtoList;
+    }
+
+    @Override
+    public List<Organization> findAllChild(Long orgId) {
+        return entityManager.createNativeQuery(
+                getSqlString(), Organization.class).setParameter("org_id", orgId).getResultList();
+    }
+
+    private String getSqlString() {
+        return "with recursive cte (org_id, org_nm, parent_id, created_date, last_modified_date, last_modified_by, created_by, start_date, end_date, org_no) as (" +
+                "  select     org_id," +
+                "              org_nm," +
+                "             parent_id," +
+                "             created_date," +
+                "             last_modified_date," +
+                "             last_modified_by," +
+                "             created_by," +
+                "             start_date," +
+                "             end_date," +
+                "             org_no" +
+                "  from       organization" +
+                "  where      parent_id = :org_id" +
+                "  union all" +
+                "  select     d.org_id," +
+                "              d.org_nm," +
+                "             d.parent_id," +
+                "             d.created_date," +
+                "             d.last_modified_date," +
+                "             d.last_modified_by," +
+                "             d.created_by," +
+                "             d.start_date," +
+                "             d.end_date," +
+                "             d.org_no" +
+                "  from       organization d" +
+                "  inner join cte" +
+                "          on d.parent_id= cte.org_id" +
+                ")" +
+                "select * from cte" +
+                " union all" +
+                "  select     org_id," +
+                "              org_nm," +
+                "             parent_id," +
+                "             created_date," +
+                "             last_modified_date," +
+                "             last_modified_by," +
+                "             created_by," +
+                "             start_date," +
+                "             end_date," +
+                "             org_no" +
+                "  from       organization" +
+                "  where      org_id = :org_id";
     }
 
     private BooleanExpression orgNmContain(String orgNm) {

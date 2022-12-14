@@ -18,6 +18,9 @@ public class OrganizationFindDto {
     private Long parentId;
 
     @JsonIgnore
+    private Set<Organization> children = new HashSet<>();
+
+    @JsonIgnore
     private Long id;
 
     public OrganizationFindDto(Organization organization) {
@@ -28,5 +31,9 @@ public class OrganizationFindDto {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public void setChildren(Set<Organization> children) {
+        this.children = children;
     }
 }

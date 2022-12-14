@@ -13,6 +13,7 @@ import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -70,9 +71,13 @@ public class OrganizationService {
 
 
     public Page<OrganizationFindDto> close(Long orgId, Pageable pageable) {
-        Organization organization = organizationRepository.findById(orgId).orElseThrow();
+//        Organization organization = organizationRepository.findById(orgId).orElseThrow();
 
-        organizationRepository.delete(organization);
+        List<Organization> allChild = organizationRepository.findAllChild(orgId);
+
+        for (Organization org : allChild) {
+            org.updateEndDate(LocalDate.now().minusDays(1));
+        }
 
         List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(null);
 

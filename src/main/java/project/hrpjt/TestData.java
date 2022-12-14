@@ -26,7 +26,7 @@ public class TestData {
         OrganizationSaveDto company = OrganizationSaveDto.builder()
                 .orgNm("company")
                 .orgNo("000001")
-                .startDate(LocalDate.now())
+                .startDate(LocalDate.of(2022, 01, 01))
                 .build();
 
         Organization save1 = organizationService.save(company);
@@ -34,7 +34,7 @@ public class TestData {
         OrganizationSaveDto org = OrganizationSaveDto.builder()
                 .orgNm("인사부")
                 .orgNo("000010")
-                .startDate(LocalDate.now())
+                .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgId(1L)
                 .build();
 
@@ -43,7 +43,7 @@ public class TestData {
         OrganizationSaveDto org2 = OrganizationSaveDto.builder()
                 .orgNm("총무부")
                 .orgNo("000011")
-                .startDate(LocalDate.now())
+                .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgId(1L)
                 .build();
 
@@ -52,7 +52,7 @@ public class TestData {
         OrganizationSaveDto org3 = OrganizationSaveDto.builder()
                 .orgNm("인사 1팀")
                 .orgNo("000020")
-                .startDate(LocalDate.now())
+                .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgId(2L)
                 .build();
 
@@ -61,7 +61,7 @@ public class TestData {
         OrganizationSaveDto o = OrganizationSaveDto.builder()
                 .orgNm("인사 1-1팀")
                 .orgNo("000030")
-                .startDate(LocalDate.now())
+                .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgId(4L)
                 .build();
 
@@ -70,7 +70,7 @@ public class TestData {
         OrganizationSaveDto org4 = OrganizationSaveDto.builder()
                 .orgNm("총무 1팀")
                 .orgNo("000031")
-                .startDate(LocalDate.now())
+                .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgId(3L)
                 .build();
 
@@ -79,7 +79,7 @@ public class TestData {
         OrganizationSaveDto org5 = OrganizationSaveDto.builder()
                 .orgNm("총무 2팀")
                 .orgNo("000032")
-                .startDate(LocalDate.now())
+                .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgId(3L)
                 .build();
 

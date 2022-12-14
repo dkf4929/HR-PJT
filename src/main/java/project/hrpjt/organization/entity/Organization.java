@@ -1,6 +1,8 @@
 package project.hrpjt.organization.entity;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import project.hrpjt.base.SubEntity;
 import project.hrpjt.employee.entity.Employee;
 
@@ -14,6 +16,7 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
 @ToString(of = {"orgNo", "orgNm"})
 public class Organization extends SubEntity {
     @Id @GeneratedValue
@@ -29,6 +32,7 @@ public class Organization extends SubEntity {
     @Column(nullable = false)
     private LocalDate startDate;
 
+    @ColumnDefault("29991231")
     private LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -67,5 +71,9 @@ public class Organization extends SubEntity {
 
     public Organization getOrganization() {
         return this;
+    }
+
+    public void updateEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }
