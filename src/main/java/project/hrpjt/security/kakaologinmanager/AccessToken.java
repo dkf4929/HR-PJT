@@ -131,7 +131,6 @@ public class AccessToken {
             }
 
             int responseCode = urlConnection.getResponseCode();
-            System.out.println("responseCode = " + responseCode);
 
             // result is json format
             br.close();

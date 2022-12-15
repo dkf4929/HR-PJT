@@ -1,5 +1,6 @@
 package project.hrpjt.organization.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -40,7 +41,7 @@ public class Organization extends SubEntity {
     private Organization parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private Set<Organization> children;
+    private Set<Organization> children = new HashSet<>();
 
     @OneToMany(mappedBy = "organization")
     private List<Employee> employees = new ArrayList<>();
@@ -64,16 +65,23 @@ public class Organization extends SubEntity {
         this.parent = parent;
     }
 
-    public void addChild(Organization child) {
-        children = new HashSet<>();
-        this.children.add(child);
-    }
-
     public Organization getOrganization() {
         return this;
     }
 
     public void updateEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public void updateOrgNo(String orgNo) {
+        this.orgNo = orgNo;
+    }
+
+    public void updateOrgNm(String orgNm) {
+        this.orgNm = orgNm;
+    }
+
+    public void updateChildren(Set<Organization> childs) {
+        this.children = childs;
     }
 }

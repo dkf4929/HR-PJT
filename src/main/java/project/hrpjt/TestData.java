@@ -114,14 +114,14 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_ORG_LEADER")
                 .hireDate(LocalDate.now())
-                .organizationId(4L)
+                .organizationId(2L)
                 .password("1234")
                 .build();
 
         EmployeeSaveDto user = EmployeeSaveDto.builder()
-                .empNo("USER")
+                .empNo("EMPLOYEE")
                 .birthDate(LocalDate.of(2000, 01, 01))
-                .empNm("USER")
+                .empNm("EMPLOYEE")
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
                 .hireDate(LocalDate.now())
