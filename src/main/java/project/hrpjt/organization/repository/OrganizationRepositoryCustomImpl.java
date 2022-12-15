@@ -1,12 +1,10 @@
 package project.hrpjt.organization.repository;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.DateExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 
@@ -65,20 +63,14 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
-    public List<OrganizerFindDto> findOrganizerByParam() {
-        List<Organization> list = queryFactory
-                .selectFrom(organization)
-                .distinct()
-                .leftJoin(organization.parent).fetchJoin()
-                .leftJoin(organization.employees, employee).fetchJoin()
-//                .where(dto.getOrgNo() == null ? null : organization.orgNo.ne("000001"))
-//                .orderBy(organization.parent.orgNo.asc().nullsFirst())
-                .fetch();
+    public List<OrganizerFindDto> findOrganizerByParam(OrganizerFindParamDto param) {
+        List<Organization> list = entityManager.createNativeQuery(
+                getSqlString(), Organization.class).setParameter("org_id", param.getOrgId()).getResultList();
 
         List<OrganizerFindDto> dtoList = new ArrayList<>();
         Map<Long, OrganizerFindDto> map = new HashMap<>();
 
-        list.stream().forEach(o -> {
+        list.forEach(o -> {
             OrganizerFindDto dto = new OrganizerFindDto(o);
 
             if (o.getParent() != null) {
@@ -87,7 +79,8 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 
             map.put(dto.getId(), dto);
 
-            if (o.getParent() != null) {
+
+            if (o.getParent() != null  && map.size() > 1) { // 첫번째 요소인지 판별
                 map.get(o.getParent().getId()).getChild().add(dto);
             } else {
                 dtoList.add(dto);
@@ -98,9 +91,39 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
+    public Optional<Organization> findOrgById(Long id) {
+        return Optional.ofNullable(entityManager.createQuery(
+                        "select o " +
+                                "from Organization o" +
+                                " where o.id = :org_id" +
+                                " and (:current between o.startDate and o.endDate)", Organization.class
+                ).setParameter("current", LocalDate.now())
+                .setParameter("org_id", id)
+                .getSingleResult());
+    }
+
+    @Override
     public List<Organization> findAllChild(Long orgId) {
-        return entityManager.createNativeQuery(
+        List<Organization> organizationList = entityManager.createNativeQuery(
                 getSqlString(), Organization.class).setParameter("org_id", orgId).getResultList();
+
+        return organizationList;
+    }
+
+    @Override //업데이트 쿼리 id 수만큼 나가서 jpql로 수정함.
+    public int updateEndDate(List<Organization> child) {
+        return entityManager.createQuery("update Organization o set o.endDate = :end_date where o in (:childs)")
+                .setParameter("end_date", LocalDate.now().minusDays(1))
+                .setParameter("childs", child)
+                .executeUpdate();
+    }
+
+    @Override
+    public Optional<Organization> findOrgByEmp(Employee employee) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(organization)
+                .where(organization.employees.contains(employee))
+                .fetchOne());
     }
 
     private String getSqlString() {

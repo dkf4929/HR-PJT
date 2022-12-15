@@ -14,6 +14,5 @@ public class AuthDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         response.sendRedirect("/");
-        System.out.println("AuthDeniedHandler.handle");
     }
 }

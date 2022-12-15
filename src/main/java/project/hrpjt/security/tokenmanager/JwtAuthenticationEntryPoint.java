@@ -17,7 +17,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        System.out.println("authException = " + authException.getClass());
         if (authException.getClass().isAssignableFrom(InsufficientAuthenticationException.class)) {
             response.sendRedirect("/"); //인증 x -> redirect:/
         }

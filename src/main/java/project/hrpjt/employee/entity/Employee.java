@@ -4,6 +4,7 @@ import javax.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@ToString(of = {"empNm"})
 public class Employee extends SubEntity implements UserDetails {
     @Id
     @GeneratedValue

@@ -1,6 +1,8 @@
 package project.hrpjt.organization.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.hrpjt.employee.entity.Employee;
@@ -13,6 +15,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @Getter
+@AllArgsConstructor
+@Builder
 public class OrganizerFindDto {
     private String orgNo;
     private String orgNm;
