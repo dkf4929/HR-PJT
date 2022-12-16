@@ -33,17 +33,17 @@ public class OrganizationService {
     public Organization save(OrganizationSaveDto dto) {
         Organization organization = dtoToEntity(dto);
 
-        if (dto.getParentOrgId() != null) {
-            Organization parent = organizationRepository.findById(dto.getParentOrgId()).orElseThrow();
+        if (dto.getParentOrgNo() != null) {
+            Organization parent = organizationRepository.findByOrgNo(dto.getParentOrgNo()).orElseThrow();
 
             organization.updateParent(parent);
 
-            if (dto.getChildOrgId() != null) {
-                List<Organization> child = organizationRepository.findAllById(dto.getChildOrgId());
+            if (dto.getChildOrgNo() != null) {
+                List<Organization> child = organizationRepository.findAllByOrgNo(dto.getChildOrgNo());
 
-                for (Organization org : child) {
-                    org.updateParent(organization);
-                }
+                child.stream().forEach(o -> {
+                    o.updateParent(organization);
+                });
             }
         }
 
@@ -172,11 +172,25 @@ public class OrganizationService {
                 }
             });
 
-            organization.getEmployees().add(employeeRepository.findAllById(dto.getAddEmpIds()).iterator().next()); // 조직에 직원 추가
+            List<Employee> addEmpList = employeeRepository.findAllById(dto.getAddEmpIds());
+
+            addEmpList.stream().forEach(e -> {
+                organization.getEmployees().add(e); // 조직에 직원 추가
+                e.updateOrganization(organization); // 조직 정보 업데이트
+            });
         }
+
         if (dto.getDeleteEmpIds() != null) {
-            organization.getEmployees().remove(employeeRepository.findAllById(dto.getDeleteEmpIds()).iterator().next()); // 직원 삭제
+            List<Employee> delEmpList = employeeRepository.findAllById(dto.getDeleteEmpIds());
+            Organization extOrg = organizationRepository.findById(8L).get(); // 발령대기 조직
+
+            delEmpList.stream().forEach(e -> {
+                organization.getEmployees().remove(e); // 직원 삭제
+                extOrg.getEmployees().add(e);
+                e.updateOrganization(organizationRepository.findById(8L).get());
+            });
         }
+
 
         return findOrganizerByParam(pageable);
     }

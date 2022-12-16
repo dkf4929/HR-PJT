@@ -24,4 +24,8 @@ public interface OrganizationRepositoryCustom {
     public Optional<Organization> findOrgById(Long id);
 
     public Optional<Organization> findOrgByEmp(Employee employee);
+
+    public Optional<Organization> findByOrgNo(String orgNo);
+
+    public List<Organization> findAllByOrgNo(List<String> orgNoList);
 }

@@ -32,7 +32,7 @@ public class EmployeeService {
     private final OrganizationRepository organizationRepository;
 
     public Employee save(EmployeeSaveDto param) {
-        Organization organization = organizationRepository.findById(param.getOrganizationId()).get();
+        Organization organization = organizationRepository.findByOrgNo(param.getOrgNo()).get();
         Employee employee = dtoToEntity(param, organization);
         organization.addEmployee(employee);
 
@@ -57,10 +57,10 @@ public class EmployeeService {
         return new PageImpl<>(collect, pageable, collect.size());
     }
 
-    public void delete(Long employeeId) {
+    public void delete(String empNo) {
         Employee loginEmployee = (Employee) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); // 인증 객체에서 로그인된 회원을 가져온다.
 
-        Employee deleteEmployee = employeeRepository.findById(employeeId).orElseThrow(() -> {
+        Employee deleteEmployee = employeeRepository.findByEmpNo(empNo).orElseThrow(() -> {
             throw new UsernameNotFoundException("존재하지 않는 회원입니다.");
         });
 
@@ -68,7 +68,7 @@ public class EmployeeService {
             throw new IllegalStateException("관리자는 삭제할 수 없습니다.");
         }
 
-        employeeRepository.deleteById(employeeId);
+        employeeRepository.delete(deleteEmployee);
     }
 
     public EmployeeFindDto edit(EmployeeUpdateDto param) {
@@ -93,7 +93,7 @@ public class EmployeeService {
     }
 
     private void updateEmployeeInfo(String role, EmployeeUpdateDto param, Organization org) {
-        Employee employee = employeeRepository.findById(param.getEmployeeId()).orElseThrow(() -> {
+        Employee employee = employeeRepository.findByEmpNo(param.getEmpNo()).orElseThrow(() -> {
             throw new NoSuchEmployeeException("존재하지 않는 사원입니다.");
         });
 
@@ -103,14 +103,14 @@ public class EmployeeService {
             employee.updateRole(param.getRole());
         }
 
-        if (param.getEmpNo() != null && role.equals("ROLE_SYS_ADMIN")) {
-            employee.updateempNo(param.getEmpNo());
+        if (param.getUpdateEmpNo() != null && role.equals("ROLE_SYS_ADMIN")) {
+            employee.updateempNo(param.getUpdateEmpNo());
         }
         if (param.getEmpNm() != null && role.equals("ROLE_SYS_ADMIN")) {
             employee.updateempNm(param.getEmpNm());
         }
-        if (param.getOrganizationId() != null && role.equals("ROLE_SYS_ADMIN")) {
-            Organization organization = organizationRepository.findById(param.getOrganizationId()).get();
+        if (param.getOrgNo() != null && role.equals("ROLE_SYS_ADMIN")) {
+            Organization organization = organizationRepository.findByOrgNo(param.getOrgNo()).get();
             employee.updateOrganization(organization);
         }
         if (param.getRetireDate() != null && (role.equals("ROLE_ORG_LEADER") && org.getId() == employee.getOrganization().getId())) {
