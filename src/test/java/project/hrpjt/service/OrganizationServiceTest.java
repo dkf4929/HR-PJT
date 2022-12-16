@@ -1,5 +1,6 @@
 package project.hrpjt.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.json.simple.JSONArray;
@@ -19,10 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.employee.dto.EmployeeUpdateDto;
-import project.hrpjt.organization.dto.OrganizationFindDto;
-import project.hrpjt.organization.dto.OrganizationFindParamDto;
-import project.hrpjt.organization.dto.OrganizationSaveDto;
-import project.hrpjt.organization.dto.OrganizerFindParamDto;
+import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
 import project.hrpjt.organization.service.OrganizationService;
@@ -37,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -74,25 +73,25 @@ public class OrganizationServiceTest {
 
     @Test
     void save() {
-        List<Long> ids = new ArrayList<>();
+        List<String> orgNoList = new ArrayList<>();
 
-        ids.add(6L);
-        ids.add(7L);
+        orgNoList.add("000031");
+        orgNoList.add("000032");
 
         OrganizationSaveDto hbm = OrganizationSaveDto.builder()
                 .orgNm("복리후생")
-                .parentOrgId(3L)
+                .parentOrgNo("000011")
                 .orgNo("000021")
-                .childOrgId(ids)
+                .childOrgNo(orgNoList)
                 .startDate(LocalDate.now())
                 .build();
 
         Organization hbmOrg = organizationService.save(hbm);
-        Organization organization1 = organizationRepository.findById(6L).get();
-        Organization organization2 = organizationRepository.findById(7L).get();
+        Organization organization1 = organizationRepository.findByOrgNo("000031").get();
+        Organization organization2 = organizationRepository.findByOrgNo("000032").get();
 
-        Assertions.assertThat(organization1.getParent()).isEqualTo(hbmOrg);
-        Assertions.assertThat(organization2.getParent()).isEqualTo(hbmOrg);
+        assertThat(organization1.getParent()).isEqualTo(hbmOrg);
+        assertThat(organization2.getParent()).isEqualTo(hbmOrg);
     }
 
     @Test
@@ -122,7 +121,7 @@ public class OrganizationServiceTest {
                         orgNm = (String) obj.get("orgNm");
                     }
 
-                    Assertions.assertThat(orgNm).isEqualTo("총무부");
+                    assertThat(orgNm).isEqualTo("총무부");
                 });
     }
 
@@ -159,10 +158,46 @@ public class OrganizationServiceTest {
         Organization organization = organizationRepository.findById(3L).get();
         Set<Organization> children = organization.getChildren();
 
-        Assertions.assertThat(organization.getEndDate()).isEqualTo(LocalDate.now().minusDays(1));
+        assertThat(organization.getEndDate()).isEqualTo(LocalDate.now().minusDays(1));
         
         for (Organization child : children) {
-            Assertions.assertThat(child.getEndDate()).isEqualTo(LocalDate.now().minusDays(1));
+            assertThat(child.getEndDate()).isEqualTo(LocalDate.now().minusDays(1));
         }
+    }
+
+    @Test
+    @DisplayName("조직 수정")
+    void update() throws Exception {
+        List<Long> list = new ArrayList<>();
+
+        OrganizationUpdateDto dto = OrganizationUpdateDto.builder()
+                .updateOrgId(3L)
+                .orgNo("123456")
+                .orgNm("테스트")
+                .parentId(2L)
+                .build();
+
+        String value = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/role_lead/organization")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(value)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .cookie(new Cookie("jwtToken", cookieValue.get())))
+                .andExpect(status().isOk());
+
+        Organization findOrg = organizationRepository.findById(3L).get();
+        Set<Organization> children = findOrg.getChildren();
+        Organization parent = organizationRepository.findById(2L).get();
+
+        assertThat(findOrg.getOrgNm()).isEqualTo("테스트");
+
+        assertThat(findOrg.getOrgNo()).isEqualTo("123456");
+
+        children.stream().forEach(c -> {
+            assertThat(c.getParent()).isEqualTo(findOrg);
+        });
+
+        assertThat(findOrg.getParent()).isEqualTo(parent);
     }
 }
