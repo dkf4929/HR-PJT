@@ -103,6 +103,23 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
+    public List<Organization> findAllByOrgNo(List<String> orgNoList) {
+        return queryFactory
+                .selectFrom(organization)
+                .where(organization.orgNo.in(orgNoList))
+                .fetch();
+    }
+
+    @Override
+    public Optional<Organization> findByOrgNo(String orgNo) {
+        return Optional.ofNullable(queryFactory
+                .select(organization)
+                .from(organization)
+                .where(organization.orgNo.eq(orgNo))
+                .fetchOne());
+    }
+
+    @Override
     public List<Organization> findAllChild(Long orgId) {
         List<Organization> organizationList = entityManager.createNativeQuery(
                 getSqlString(), Organization.class).setParameter("org_id", orgId).getResultList();

@@ -34,7 +34,7 @@ public class LoginService {
     private final PasswordEncoder encoder;
 
     public String login(LoginParamDto param, HttpServletResponse response) {
-        Employee employee = employeeRepository.findByempNo(param.getEmpNo())
+        Employee employee = employeeRepository.findByEmpNo(param.getEmpNo())
                 .orElseThrow(() -> {
                     throw new NoSuchEmployeeException("등록된 아이디가 없습니다.");
                 });

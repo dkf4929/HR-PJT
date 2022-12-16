@@ -16,8 +16,8 @@ import java.util.List;
 public class OrganizationSaveDto {
     private String orgNo;
     private String orgNm;
-    private Long parentOrgId;
-    private List<Long> childOrgId = new ArrayList<>();
+    private String parentOrgNo;
+    private List<String> childOrgNo = new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;
 

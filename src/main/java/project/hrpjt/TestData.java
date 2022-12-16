@@ -35,7 +35,7 @@ public class TestData {
                 .orgNm("인사부")
                 .orgNo("000010")
                 .startDate(LocalDate.of(2022, 01, 01))
-                .parentOrgId(1L)
+                .parentOrgNo("000001")
                 .build();
 
         Organization save2 = organizationService.save(org);
@@ -44,7 +44,7 @@ public class TestData {
                 .orgNm("총무부")
                 .orgNo("000011")
                 .startDate(LocalDate.of(2022, 01, 01))
-                .parentOrgId(1L)
+                .parentOrgNo("000001")
                 .build();
 
         Organization save3 = organizationService.save(org2);
@@ -53,7 +53,7 @@ public class TestData {
                 .orgNm("인사 1팀")
                 .orgNo("000020")
                 .startDate(LocalDate.of(2022, 01, 01))
-                .parentOrgId(2L)
+                .parentOrgNo("000010")
                 .build();
 
         organizationService.save(org3);
@@ -62,7 +62,7 @@ public class TestData {
                 .orgNm("인사 1-1팀")
                 .orgNo("000030")
                 .startDate(LocalDate.of(2022, 01, 01))
-                .parentOrgId(4L)
+                .parentOrgNo("000020")
                 .build();
 
         organizationService.save(o);
@@ -71,7 +71,7 @@ public class TestData {
                 .orgNm("총무 1팀")
                 .orgNo("000031")
                 .startDate(LocalDate.of(2022, 01, 01))
-                .parentOrgId(3L)
+                .parentOrgNo("000011")
                 .build();
 
         organizationService.save(org4);
@@ -80,10 +80,18 @@ public class TestData {
                 .orgNm("총무 2팀")
                 .orgNo("000032")
                 .startDate(LocalDate.of(2022, 01, 01))
-                .parentOrgId(3L)
+                .parentOrgNo("000011")
                 .build();
 
         organizationService.save(org5);
+
+        OrganizationSaveDto org6 = OrganizationSaveDto.builder()
+                .orgNm("발령 대기")
+                .orgNo("999999")
+                .startDate(LocalDate.of(2022, 01, 01))
+                .build();
+
+        organizationService.save(org6);
 
         EmployeeSaveDto ceo = EmployeeSaveDto.builder()
                 .empNo("CEO")
@@ -92,7 +100,7 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_CEO")
                 .hireDate(LocalDate.now())
-                .organizationId(1L)
+                .orgNo("000001")
                 .password("1234")
                 .build();
 
@@ -103,7 +111,7 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_SYS_ADMIN")
                 .hireDate(LocalDate.now())
-                .organizationId(2L)
+                .orgNo("000010")
                 .password("1234")
                 .build();
 
@@ -114,7 +122,7 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_ORG_LEADER")
                 .hireDate(LocalDate.now())
-                .organizationId(2L)
+                .orgNo("000010")
                 .password("1234")
                 .build();
 
@@ -125,7 +133,7 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
                 .hireDate(LocalDate.now())
-                .organizationId(4L)
+                .orgNo("000020")
                 .password("1234")
                 .build();
 

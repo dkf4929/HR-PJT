@@ -7,12 +7,14 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import project.hrpjt.organization.entity.Organization;
 
 import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class EmployeeSaveDto {
     private String empNo;
@@ -23,7 +25,7 @@ public class EmployeeSaveDto {
     private LocalDate birthDate;
     private LocalDate hireDate;
     private LocalDate retireDate;
-    private Long organizationId;
+    private String orgNo;
     private String kakaoMail;
     private String kakaoId;
 }

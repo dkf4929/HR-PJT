@@ -24,7 +24,7 @@ public class EmployeeController {
 
     @ResponseBody
     @PostMapping("role_adm/employees") //회원 저장
-    public String save(@Valid EmployeeSaveDto param) {
+    public String save(@RequestBody @Valid EmployeeSaveDto param) {
         employeeService.save(param);
         return "저장완료";
     }
@@ -45,8 +45,8 @@ public class EmployeeController {
     // 시스템 관리자는 삭제 불가.
     @ResponseBody
     @DeleteMapping("/role_adm/employees") //회원 삭제
-    public String deleteEmployee(Long employeeId) {
-        employeeService.delete(employeeId);
+    public String deleteEmployee(String empNo) {
+        employeeService.delete(empNo);
         return "삭제 되었습니다.";
     }
 

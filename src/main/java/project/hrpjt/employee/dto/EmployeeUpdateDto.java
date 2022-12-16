@@ -13,9 +13,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class EmployeeUpdateDto {
-    private Long employeeId;
-    private Long organizationId;
     private String empNo;
+    private String orgNo;
+    private String updateEmpNo;
     private String password;
     private String role;
     private String empNm;
