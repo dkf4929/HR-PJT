@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.employee.dto.EmployeeFindDto;
+import project.hrpjt.employee.dto.EmployeeSaveDto;
 import project.hrpjt.employee.dto.EmployeeUpdateDto;
 import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.employee.repository.EmployeeRepository;
@@ -25,7 +26,9 @@ import project.hrpjt.exception.NoSuchEmployeeException;
 import project.hrpjt.organization.repository.OrganizationRepository;
 import project.hrpjt.organization.service.OrganizationService;
 
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.*;
@@ -63,63 +66,38 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("유저 권한으로 사원 생성 시 redirect")
-    void userAuthTest() throws Exception {
-        mockMvc.perform(post("/login")
-                        .param("empNo", "USER")  // user 권한으로 로그인
-                        .param("password", "1234")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(result -> Arrays.stream(result.getResponse().getCookies())
-                        .filter((c) -> c.getName().equals("jwtToken"))
-                        .forEach((c) -> cookieValue.set(c.getValue())));   // result에서 쿠키값 추출
-
-        mockMvc.perform(post("/role_adm/employees/add")
-                        .param("empNo", "userA")
-                        .param("empNm", "userA")
-                        .param("gender", "M")
-                        .param("role", "ROLE_EMPLOYEE")
-                        .param("organizationId", "2")
-                        .param("password", "1234")
-                        .cookie(new Cookie("jwtToken", cookieValue.get()))  // set cookie
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())  // admin 권한일 경우 ok
-                .andDo(print());
-    }
-
-    @Test
     @DisplayName("시스템 권한으로 직원 생성")
     void adminAuthTest() throws Exception {
-        mockMvc.perform(post("/role_adm/employees/add")
-                        .param("empNo", "userA")
-                        .param("empNm", "userA")
-                        .param("gender", "M")
-                        .param("role", "ROLE_EMPLOYEE")
-                        .param("organizationId", "2")
-                        .param("password", "1234")
+        EmployeeSaveDto dto = EmployeeSaveDto.builder()
+                .empNo("userA")
+                .empNm("userA")
+                .gender("M")
+                .role("ROLE_EMPLOYEE")
+                .password("1234")
+                .orgNo("000030")
+                .birthDate(LocalDate.now())
+                .build();
+
+        String content = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(post("/role_adm/employees")
+                        .content(content)
                         .cookie(new Cookie("jwtToken", cookieValue.get()))  // set cookie
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())  // admin 권한일 경우 ok
-                .andDo(print());
-    }
+                .andDo(result -> {
+                    Employee userA = employeeRepository.findByEmpNo("userA").get();
 
-    @Test
-    @DisplayName("모든 직원 검색")
-    void findAll() throws Exception {
-        PageRequest pageRequest = PageRequest.of(1, 10);
-        Page<EmployeeFindDto> all = employeeService.findAll(pageRequest);
-
-        assertThat(all.getSize()).isEqualTo(3);
+                    assertThat(userA.getEmpNo()).isEqualTo("userA");
+                });
     }
 
     @Test
     @DisplayName("직원 삭제")
     void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/employees/delete")
-                        .param("employeeId", "5")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/employees")
+                        .param("empNo", "EMPLOYEE")
                         .cookie(new Cookie("jwtToken", cookieValue.get()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -127,21 +105,21 @@ public class EmployeeServiceTest {
                 .andDo(print());
 
         assertThatThrownBy(() -> {
-            employeeService.findEmployee(2L);
-        }).isInstanceOf(NoSuchEmployeeException.class);
+            employeeRepository.findByEmpNo("EMPLOYEE").get();
+        }).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     @DisplayName("직원 정보 수정")
     void update() throws Exception {
         EmployeeUpdateDto dto = EmployeeUpdateDto.builder()
-                .employeeId(5L)
-                .organizationId(1L)
+                .empNo("EMPLOYEE")
+                .orgNo("000010")
                 .build();
 
         String value = objectMapper.writeValueAsString(dto);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/role_emp/employees/edit")
+        mockMvc.perform(MockMvcRequestBuilders.put("/role_emp/employees")
                         .content(value)
                         .cookie(new Cookie("jwtToken", cookieValue.get()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -149,9 +127,9 @@ public class EmployeeServiceTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        Employee employee = employeeRepository.findById(5L).get();
+        Employee employee = employeeRepository.findByEmpNo("EMPLOYEE").get();
 
-        Assertions.assertThat(employee.getOrganization().getOrgNm()).isEqualTo("company");
+        Assertions.assertThat(employee.getOrganization().getOrgNm()).isEqualTo("인사부");
 
     }
 }
