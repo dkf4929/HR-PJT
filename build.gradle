@@ -38,6 +38,7 @@ dependencies {
 	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 	implementation 'net.iharder:base64:2.3.9'
 	implementation 'javax.persistence:javax.persistence-api:2.2'
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
