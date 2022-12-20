@@ -21,9 +21,9 @@ import project.hrpjt.security.tokenmanager.JwtTokenProvider;
 public class WebSecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final String[] whiteList = {"/", "/login", "/login/kakao", "/kakao", "/logout"};  // security 적용 안할 path 설정
-    private final String[] adminPath = {"role_adm/**"}; // 관리자 허용 path
-    private final String[] leaderPath = {"role_lead/**"};
-    private final String[] userPath = {"role_emp/**"}; // 직원 허용 path
+    private final String[] adminPath = {"/role_adm/**"}; // 관리자 허용 path
+    private final String[] leaderPath = {"/role_lead/**"};
+    private final String[] userPath = {"/role_emp/**"}; // 직원 허용 path
     private final UserOAuth2Service userOAuth2Service;
     private final AccessDeniedHandler accessDeniedHandler;
 
@@ -50,10 +50,11 @@ public class WebSecurityConfig {
                     response.sendRedirect("/");
                 }) // logout -> redirect:/
                 .logoutUrl("/logout")
-                .deleteCookies("jwtToken")  // logout -> delete jwt cookie
+                .deleteCookies("jwtToken", "JSESSIONID")  // logout -> delete jwt cookie
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, exception) -> {
+                    log.info("인증 실패");
                     response.sendRedirect("/");
                 })
                 .accessDeniedHandler(accessDeniedHandler);
