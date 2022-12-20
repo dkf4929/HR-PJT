@@ -51,8 +51,8 @@ public class OrganizationService {
     }
 
 
-    public Page<OrganizationFindDto> findAll(OrganizationFindParamDto dto, Pageable pageable) {
-        List<OrganizationFindDto> list = organizationRepository.findAllOrg(dto);
+    public Page<OrganizationFindDto> findAll(Long orgId, Pageable pageable) {
+        List<OrganizationFindDto> list = organizationRepository.findAllOrg(orgId);
 
         return new PageImpl<>(list, pageable, list.size());
     }
@@ -102,7 +102,7 @@ public class OrganizationService {
             throw new IllegalStateException("해당 부서 또는 하위 부서에 소속된 사원이 있습니다.");
         }
 
-        List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(OrganizationFindParamDto.builder().build());  // 전체 조직도 조회
+        List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(null);  // 전체 조직도 조회
 
         return new PageImpl<>(orgList, pageable, orgList.size());
     }

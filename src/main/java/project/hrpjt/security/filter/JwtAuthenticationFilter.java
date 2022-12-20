@@ -23,7 +23,7 @@ import java.util.Arrays;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final String[] whiteList = {"/login", "/login/kakao", "/kakao", ".ico", "/error", "/logout", "swagger"}; // 토큰 인증 안할 경로 설정
+    private final String[] whiteList = {"/login", "/login/kakao", "/kakao", ".ico", "/error", "/logout"}; // 토큰 인증 안할 경로 설정
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException, IOException {
@@ -32,8 +32,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String URI = req.getRequestURI();
 
         if (!Arrays.stream(whiteList).anyMatch(a -> URI.contains(a)) && !URI.equals("/")) {
-            //get token info
-
             Cookie cookie = resolveToken((HttpServletRequest) request);
 
             String token = cookie.getValue();

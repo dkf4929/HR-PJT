@@ -59,7 +59,6 @@ public class EmployeeServiceTest {
                         .param("password", "1234")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andDo(result -> Arrays.stream(result.getResponse().getCookies())
                         .filter((c) -> c.getName().equals("jwtToken"))
                         .forEach((c) -> cookieValue.set(c.getValue())));   // result에서 쿠키값 추출

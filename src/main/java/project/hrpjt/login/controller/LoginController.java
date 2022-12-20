@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import project.hrpjt.login.dto.LoginParamDto;
 import project.hrpjt.security.kakaologinmanager.AccessToken;
 import project.hrpjt.login.service.LoginService;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Controller
+@ApiIgnore
 @RequiredArgsConstructor
 public class LoginController {
     private final LoginService loginService;
@@ -21,9 +23,9 @@ public class LoginController {
     private final PasswordEncoder encoder;
 
     @PostMapping("/login")
-    @ResponseBody
     public String login(LoginParamDto param, HttpServletResponse response) {
-        return loginService.login(param, response);
+        loginService.login(param, response);
+        return "redirect:swagger-ui/index.html";
     }
 
     @GetMapping("/kakao")
