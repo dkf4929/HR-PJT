@@ -28,7 +28,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
-    public List<OrganizationFindDto> findAllOrg(OrganizationFindParamDto dto) {
+    public List<OrganizationFindDto> findAllOrg(Long orgId) {
 //            List<Organization> organizationList = entityManager.createQuery("select o from Organization o" +
 //                            " left join fetch o.parent p" +
 //                            " where :current between o.startDate and o.endDate" +
@@ -36,7 +36,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
 //                    .getResultList();
 
         List<Organization> organizationList = entityManager.createNativeQuery(
-                getSqlString(), Organization.class).setParameter("org_id", dto.getOrgId()).getResultList();
+                getSqlString(), Organization.class).setParameter("org_id", orgId).getResultList();
 
         List<OrganizationFindDto> dtoList = new ArrayList<>();
         Map<Long, OrganizationFindDto> map = new HashMap<>();

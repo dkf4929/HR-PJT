@@ -54,7 +54,6 @@ public class WebSecurityConfig {
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, exception) -> {
-                    log.error("인증 에러");
                     response.sendRedirect("/");
                 })
                 .accessDeniedHandler(accessDeniedHandler);

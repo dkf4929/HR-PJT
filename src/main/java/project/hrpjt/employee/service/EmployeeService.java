@@ -76,12 +76,12 @@ public class EmployeeService {
 
         String role = loginEmp.getRole(); // 로그인한 직원의 권한 정보
 
-        updateEmployeeInfo(role, param, loginEmp.getOrganization());
+        Employee employee = updateEmployeeInfo(role, param, loginEmp.getOrganization());
 
         return EmployeeFindDto.builder()
                 .organization(EmployeeOrgDto.builder()
-                        .orgNo(loginEmp.getOrganization().getOrgNo())
-                        .orgNm(loginEmp.getOrganization().getOrgNm()).build())
+                        .orgNo(employee.getOrganization().getOrgNo())
+                        .orgNm(employee.getOrganization().getOrgNm()).build())
                 .retireDate(loginEmp.getRetireDate())
                 .hireDate(loginEmp.getHireDate())
                 .empNo(loginEmp.getEmpNo())
@@ -92,7 +92,7 @@ public class EmployeeService {
                 .build();
     }
 
-    private void updateEmployeeInfo(String role, EmployeeUpdateDto param, Organization org) {
+    private Employee updateEmployeeInfo(String role, EmployeeUpdateDto param, Organization org) {
         Employee employee = employeeRepository.findByEmpNo(param.getEmpNo()).orElseThrow(() -> {
             throw new NoSuchEmployeeException("존재하지 않는 사원입니다.");
         });
@@ -119,6 +119,8 @@ public class EmployeeService {
         if (param.getPassword() != null) {
             employee.updatePassword(encoder.encode(param.getPassword()));
         }
+
+        return employee;
     }
 
     private EmployeeFindDto entityToDto(Employee employee) {
