@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.employee.dto.EmployeeOrgDto;
 import project.hrpjt.employee.dto.EmployeeUpdateDto;
 import project.hrpjt.employee.entity.Employee;
+import project.hrpjt.exception.NoAuthorityException;
 import project.hrpjt.exception.NoSuchEmployeeException;
 import project.hrpjt.employee.dto.EmployeeFindDto;
 import project.hrpjt.employee.dto.EmployeeSaveDto;

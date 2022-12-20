@@ -4,6 +4,11 @@ import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
+import project.hrpjt.appointment.dto.AppointmentFindDto;
+import project.hrpjt.appointment.dto.AppointmentSaveDto;
+import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
+import project.hrpjt.appointment.entity.enumeration.AppointmentType;
+import project.hrpjt.appointment.service.AppointmentService;
 import project.hrpjt.employee.dto.EmployeeSaveDto;
 import project.hrpjt.employee.service.EmployeeService;
 import project.hrpjt.organization.dto.OrganizationSaveDto;
@@ -11,14 +16,13 @@ import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.service.OrganizationService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
 public class TestData {
     private final EmployeeService employeeService;
     private final OrganizationService organizationService;
+    private final AppointmentService appointmentService;
 
     @PostConstruct
     @Transactional
@@ -99,7 +103,7 @@ public class TestData {
                 .empNm("CEO")
                 .gender("M")
                 .role("ROLE_CEO")
-                .hireDate(LocalDate.now())
+                .hireDate(LocalDate.of(1980, 01, 01))
                 .orgNo("000001")
                 .password("1234")
                 .build();
@@ -110,7 +114,7 @@ public class TestData {
                 .empNm("ADMIN")
                 .gender("M")
                 .role("ROLE_SYS_ADMIN")
-                .hireDate(LocalDate.now())
+                .hireDate(LocalDate.of(1990, 01, 01))
                 .orgNo("000010")
                 .password("1234")
                 .build();
@@ -121,7 +125,7 @@ public class TestData {
                 .empNm("ORG_LEADER")
                 .gender("M")
                 .role("ROLE_ORG_LEADER")
-                .hireDate(LocalDate.now())
+                .hireDate(LocalDate.of(1990, 01, 01))
                 .orgNo("000010")
                 .password("1234")
                 .build();
@@ -132,7 +136,7 @@ public class TestData {
                 .empNm("EMPLOYEE")
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
-                .hireDate(LocalDate.now())
+                .hireDate(LocalDate.of(2022, 01, 01))
                 .orgNo("000020")
                 .password("1234")
                 .build();
@@ -141,5 +145,52 @@ public class TestData {
         employeeService.save(ceo);
         employeeService.save(user);
         employeeService.save(leader);
+
+        AppointmentSaveDto app1 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+                .orgNo("000030")
+                .status(AppointmentStatus.APPR)
+                .startDate(LocalDate.of(1990, 01, 01))
+                .empNo("ADMIN")
+                .endDate(LocalDate.of(1994,12,30))
+                .build();
+
+        AppointmentSaveDto app2 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+                .status(AppointmentStatus.APPR)
+                .orgNo("000020")
+                .startDate(LocalDate.of(1995, 01, 01))
+                .endDate(LocalDate.of(1999,12,30))
+                .empNo("ADMIN")
+                .build();
+
+        AppointmentSaveDto app3 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+                .status(AppointmentStatus.APPR)
+                .orgNo("000010")
+                .startDate(LocalDate.of(2000, 01, 01))
+                .empNo("ADMIN")
+                .build();
+
+        AppointmentSaveDto app4 = AppointmentSaveDto.builder()
+                .type(AppointmentType.DISEASE_LEAVE)
+                .status(AppointmentStatus.APPR)
+                .startDate(LocalDate.of(2010, 03, 01))
+                .endDate(LocalDate.of(2010, 03, 04))
+                .empNo("ADMIN")
+                .build();
+
+        AppointmentSaveDto app5 = AppointmentSaveDto.builder()
+                .type(AppointmentType.RETURN)
+                .status(AppointmentStatus.APPR)
+                .startDate(LocalDate.of(2010, 03, 05))
+                .empNo("ADMIN")
+                .build();
+
+        appointmentService.save(app1);
+        appointmentService.save(app2);
+        appointmentService.save(app3);
+        appointmentService.save(app4);
+        appointmentService.save(app5);
     }
 }

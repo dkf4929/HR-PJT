@@ -96,15 +96,14 @@ public class OrganizationServiceTest {
     @Test
     @DisplayName("조직도 조회")
     void findAll() throws Exception {
-        OrganizationFindParamDto dto = OrganizationFindParamDto.builder()
-                .orgId(3L)
-                .build();
-
-        String value = objectMapper.writeValueAsString(dto);
-
+//        OrganizationFindParamDto dto = OrganizationFindParamDto.builder()
+//                .orgId(3L)
+//                .build();
+//
+//        String value = objectMapper.writeValueAsString(dto);
         mockMvc.perform(get("/role_emp/organization")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(value)
+                        .param("orgId", "3")
                         .accept(MediaType.APPLICATION_JSON)
                         .cookie(new Cookie("jwtToken", cookieValue.get())))
                 .andExpect(status().isOk())
