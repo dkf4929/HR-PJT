@@ -14,10 +14,8 @@ import java.time.LocalDate;
 @Builder
 public class EmployeeUpdateDto {
     private String empNo;
-    private String orgNo;
     private String updateEmpNo;
     private String password;
     private String role;
     private String empNm;
-    private LocalDate retireDate;
 }

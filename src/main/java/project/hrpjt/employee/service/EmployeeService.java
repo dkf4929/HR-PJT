@@ -33,15 +33,13 @@ public class EmployeeService {
     private final OrganizationRepository organizationRepository;
 
     public Employee save(EmployeeSaveDto param) {
-        Organization organization = organizationRepository.findByOrgNo(param.getOrgNo()).get();
-        Employee employee = dtoToEntity(param, organization);
-        organization.addEmployee(employee);
+        Employee employee = dtoToEntity(param);
 
         return employeeRepository.save(employee);
     }
 
     public EmployeeFindDto findEmployee(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> {
+        Employee employee = employeeRepository.findByIdFetch(employeeId).orElseThrow(() -> {
             throw new NoSuchEmployeeException("존재하지 않는 회원입니다.");
         });
 
@@ -49,27 +47,13 @@ public class EmployeeService {
     }
 
     public Page<EmployeeFindDto> findAll(Pageable pageable) {
-        List<Employee> employees = employeeRepository.findAll();
+        List<Employee> employees = employeeRepository.findAllFetch();
 
         List<EmployeeFindDto> collect = employees.stream()
                 .map(m -> entityToDto(m))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(collect, pageable, collect.size());
-    }
-
-    public void delete(String empNo) {
-        Employee loginEmployee = (Employee) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); // 인증 객체에서 로그인된 회원을 가져온다.
-
-        Employee deleteEmployee = employeeRepository.findByEmpNo(empNo).orElseThrow(() -> {
-            throw new UsernameNotFoundException("존재하지 않는 회원입니다.");
-        });
-
-        if (deleteEmployee.getRole().equals("ROLE_SYS_ADMIN")) {
-            throw new IllegalStateException("관리자는 삭제할 수 없습니다.");
-        }
-
-        employeeRepository.delete(deleteEmployee);
     }
 
     public EmployeeFindDto edit(EmployeeUpdateDto param) {
@@ -81,15 +65,15 @@ public class EmployeeService {
 
         return EmployeeFindDto.builder()
                 .organization(EmployeeOrgDto.builder()
-                        .orgNo(employee.getOrganization().getOrgNo())
-                        .orgNm(employee.getOrganization().getOrgNm()).build())
-                .retireDate(loginEmp.getRetireDate())
-                .hireDate(loginEmp.getHireDate())
-                .empNo(loginEmp.getEmpNo())
-                .gender(loginEmp.getGender())
-                .empNm(loginEmp.getEmpNm())
-                .birthDate(loginEmp.getBirthDate())
-                .role(loginEmp.getRole())
+                        .organization(employee.getOrganization())
+                        .build())
+                .retireDate(employee.getRetireDate())
+                .hireDate(employee.getHireDate())
+                .empNo(employee.getEmpNo())
+                .gender(employee.getGender())
+                .empNm(employee.getEmpNm())
+                .birthDate(employee.getBirthDate())
+                .role(employee.getRole())
                 .build();
     }
 
@@ -108,14 +92,7 @@ public class EmployeeService {
             employee.updateempNo(param.getUpdateEmpNo());
         }
         if (param.getEmpNm() != null && role.equals("ROLE_SYS_ADMIN")) {
-            employee.updateempNm(param.getEmpNm());
-        }
-        if (param.getOrgNo() != null && role.equals("ROLE_SYS_ADMIN")) {
-            Organization organization = organizationRepository.findByOrgNo(param.getOrgNo()).get();
-            employee.updateOrganization(organization);
-        }
-        if (param.getRetireDate() != null && (role.equals("ROLE_ORG_LEADER") && org.getId() == employee.getOrganization().getId())) {
-            employee.updatRetireDate(param.getRetireDate());
+            employee.updateEmpNm(param.getEmpNm());
         }
         if (param.getPassword() != null) {
             employee.updatePassword(encoder.encode(param.getPassword()));
@@ -131,14 +108,16 @@ public class EmployeeService {
                         .birthDate(employee.getBirthDate())
                         .gender(employee.getGender())
 //                        .families(employee.getFamilies())
+                        .organization(EmployeeOrgDto.builder()
+                                .organization(employee.getOrganization())
+                                .build())
                         .empNo(employee.getEmpNo())
                         .hireDate(employee.getHireDate())
-//                        .organization(employee.getOrganization())
                         .retireDate(employee.getRetireDate())
                         .build();
     }
 
-    private Employee dtoToEntity(EmployeeSaveDto param, Organization organization) {
+    private Employee dtoToEntity(EmployeeSaveDto param) {
         return Employee.builder()
                 .empNo(param.getEmpNo())
                 .password(encoder.encode(param.getPassword()))
@@ -147,8 +126,6 @@ public class EmployeeService {
                 .hireDate(LocalDate.now())
                 .kakaoId(param.getKakaoId())
                 .role(param.getRole())
-                .retireDate(param.getRetireDate())
-                .organization(organization)
                 .birthDate(param.getBirthDate())
                 .gender(param.getGender())
                 .build();

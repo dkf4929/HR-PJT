@@ -24,8 +24,6 @@ public class EmployeeSaveDto {
     private String gender;
     private LocalDate birthDate;
     private LocalDate hireDate;
-    private LocalDate retireDate;
-    private String orgNo;
     private String kakaoMail;
     private String kakaoId;
 }
