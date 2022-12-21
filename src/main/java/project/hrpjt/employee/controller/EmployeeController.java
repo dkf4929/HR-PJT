@@ -46,17 +46,6 @@ public class EmployeeController {
         return employeeService.findAll(pageable);
     }
 
-    // 시스템 관리자는 삭제 불가.
-    @ApiOperation(
-            value = "직원 삭제"
-    )
-    @DeleteMapping("/role_adm/employees") //회원 삭제
-    public String deleteEmployee(String empNo) {
-        employeeService.delete(empNo);
-        return "삭제 되었습니다.";
-    }
-
-
 //     1. 패스워드를 제외한 항목은 유저 권한을 가진 직원이 수정 불가능함.
 //     2. 관리자 권한을 가진 직원이 해당 직원을 같은 권한으로 설정할 수 없음.
 //     3. 변경 가능한 권한 항목 -> sys_admin(org_leader 권한 부여 가능), ceo(sys_admin 권한 부여 가능)

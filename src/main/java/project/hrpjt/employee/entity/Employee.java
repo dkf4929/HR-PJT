@@ -71,7 +71,7 @@ public class Employee extends SubEntity implements UserDetails {
     }
 
     @Builder
-    public Employee(String empNo, String password, String role, String empNm, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId, Organization organization) {
+    public Employee(String empNo, String password, String role, String empNm, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId) {
         this.empNo = empNo;
         this.password = password;
         this.role = role;
@@ -82,7 +82,7 @@ public class Employee extends SubEntity implements UserDetails {
         this.retireDate = retireDate;
         this.kakaoMail = kakaoMail;
         this.kakaoId = kakaoId;
-        this.organization = organization;
+//        this.organization = organization;
     }
 
     @Override
@@ -131,7 +131,7 @@ public class Employee extends SubEntity implements UserDetails {
         this.role = role;
     }
 
-    public void updateempNm(String empNm) {
+    public void updateEmpNm(String empNm) {
         this.empNm = empNm;
     }
 
