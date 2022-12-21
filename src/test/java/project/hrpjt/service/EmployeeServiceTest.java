@@ -73,7 +73,6 @@ public class EmployeeServiceTest {
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
                 .password("1234")
-                .orgNo("000030")
                 .birthDate(LocalDate.now())
                 .build();
 
@@ -131,4 +130,5 @@ public class EmployeeServiceTest {
         Assertions.assertThat(employee.getOrganization().getOrgNm()).isEqualTo("인사부");
 
     }
+
 }

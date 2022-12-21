@@ -3,6 +3,12 @@ package project.hrpjt;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.appointment.dto.AppointmentFindDto;
 import project.hrpjt.appointment.dto.AppointmentSaveDto;
@@ -23,6 +29,7 @@ public class TestData {
     private final EmployeeService employeeService;
     private final OrganizationService organizationService;
     private final AppointmentService appointmentService;
+    private final UserDetailsService userDetailsService;
 
     @PostConstruct
     @Transactional
@@ -33,7 +40,7 @@ public class TestData {
                 .startDate(LocalDate.of(2022, 01, 01))
                 .build();
 
-        Organization save1 = organizationService.save(company);
+        organizationService.save(company);
 
         OrganizationSaveDto org = OrganizationSaveDto.builder()
                 .orgNm("인사부")
@@ -42,7 +49,7 @@ public class TestData {
                 .parentOrgNo("000001")
                 .build();
 
-        Organization save2 = organizationService.save(org);
+        organizationService.save(org);
 
         OrganizationSaveDto org2 = OrganizationSaveDto.builder()
                 .orgNm("총무부")
@@ -51,7 +58,7 @@ public class TestData {
                 .parentOrgNo("000001")
                 .build();
 
-        Organization save3 = organizationService.save(org2);
+        organizationService.save(org2);
 
         OrganizationSaveDto org3 = OrganizationSaveDto.builder()
                 .orgNm("인사 1팀")
@@ -73,7 +80,7 @@ public class TestData {
 
         OrganizationSaveDto org4 = OrganizationSaveDto.builder()
                 .orgNm("총무 1팀")
-                .orgNo("000031")
+                .orgNo("000021")
                 .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgNo("000011")
                 .build();
@@ -82,7 +89,7 @@ public class TestData {
 
         OrganizationSaveDto org5 = OrganizationSaveDto.builder()
                 .orgNm("총무 2팀")
-                .orgNo("000032")
+                .orgNo("000022")
                 .startDate(LocalDate.of(2022, 01, 01))
                 .parentOrgNo("000011")
                 .build();
@@ -104,7 +111,6 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_CEO")
                 .hireDate(LocalDate.of(1980, 01, 01))
-                .orgNo("000001")
                 .password("1234")
                 .build();
 
@@ -115,7 +121,6 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_SYS_ADMIN")
                 .hireDate(LocalDate.of(1990, 01, 01))
-                .orgNo("000010")
                 .password("1234")
                 .build();
 
@@ -126,25 +131,45 @@ public class TestData {
                 .gender("M")
                 .role("ROLE_ORG_LEADER")
                 .hireDate(LocalDate.of(1990, 01, 01))
-                .orgNo("000010")
                 .password("1234")
                 .build();
 
-        EmployeeSaveDto user = EmployeeSaveDto.builder()
+        EmployeeSaveDto employee = EmployeeSaveDto.builder()
                 .empNo("EMPLOYEE")
                 .birthDate(LocalDate.of(2000, 01, 01))
                 .empNm("EMPLOYEE")
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
                 .hireDate(LocalDate.of(2022, 01, 01))
-                .orgNo("000020")
+                .password("1234")
+                .build();
+
+        EmployeeSaveDto employee2 = EmployeeSaveDto.builder()
+                .empNo("EMPLOYEE2")
+                .birthDate(LocalDate.of(2000, 01, 01))
+                .empNm("EMPLOYEE2")
+                .gender("M")
+                .role("ROLE_EMPLOYEE")
+                .hireDate(LocalDate.of(2022, 01, 01))
+                .password("1234")
+                .build();
+
+        EmployeeSaveDto leader2 = EmployeeSaveDto.builder()
+                .empNo("LEADER2")
+                .birthDate(LocalDate.of(2000, 01, 01))
+                .empNm("LEADER2")
+                .gender("M")
+                .role("ROLE_ORG_LEADER")
+                .hireDate(LocalDate.of(1998, 01, 01))
                 .password("1234")
                 .build();
 
         employeeService.save(admin);
         employeeService.save(ceo);
-        employeeService.save(user);
+        employeeService.save(employee);
+        employeeService.save(employee2);
         employeeService.save(leader);
+        employeeService.save(leader2);
 
         AppointmentSaveDto app1 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
@@ -160,7 +185,7 @@ public class TestData {
                 .status(AppointmentStatus.APPR)
                 .orgNo("000020")
                 .startDate(LocalDate.of(1995, 01, 01))
-                .endDate(LocalDate.of(1999,12,30))
+//                .endDate(LocalDate.of(1999,12,30))
                 .empNo("ADMIN")
                 .build();
 
@@ -187,10 +212,67 @@ public class TestData {
                 .empNo("ADMIN")
                 .build();
 
+        AppointmentSaveDto app6 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+                .status(AppointmentStatus.APPR)
+                .orgNo("000001")
+                .startDate(LocalDate.of(1980, 01, 01))
+                .empNo("CEO")
+                .build();
+
+        AppointmentSaveDto app7 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+                .status(AppointmentStatus.APPR)
+                .orgNo("000020")
+                .startDate(LocalDate.of(1997, 01, 01))
+                .empNo("ORG_LEADER")
+                .build();
+
+        AppointmentSaveDto app8 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+                .status(AppointmentStatus.APPR)
+                .orgNo("000020")
+                .startDate(LocalDate.of(2022, 01, 01))
+                .empNo("EMPLOYEE")
+                .build();
+
+        AppointmentSaveDto app9 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+//                .status(AppointmentStatus.APPR)
+                .orgNo("000022")
+                .startDate(LocalDate.of(2022, 01, 01))
+                .empNo("EMPLOYEE2")
+                .build();
+
+        AppointmentSaveDto app10 = AppointmentSaveDto.builder()
+                .type(AppointmentType.ORG)
+                .status(AppointmentStatus.APPR)
+                .orgNo("000011")
+                .startDate(LocalDate.of(1998, 01, 01))
+                .empNo("LEADER2")
+                .build();
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername("ADMIN");
+        userDetails.getAuthorities();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         appointmentService.save(app1);
         appointmentService.save(app2);
         appointmentService.save(app3);
         appointmentService.save(app4);
         appointmentService.save(app5);
+        appointmentService.save(app6);
+        appointmentService.save(app7);
+        appointmentService.save(app8);
+        appointmentService.save(app9);
+        appointmentService.save(app10);
+
+        appointmentService.approve(17L, null);
+        appointmentService.approve(20L, null);
+        appointmentService.approve(21L, null);
+        appointmentService.approve(22L, null);
+        appointmentService.approve(24L, null);
     }
 }
