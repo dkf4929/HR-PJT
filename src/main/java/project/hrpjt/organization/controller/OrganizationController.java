@@ -12,6 +12,8 @@ import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.service.OrganizationService;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class OrganizationController {
@@ -22,7 +24,7 @@ public class OrganizationController {
     @ApiOperation(
             value = "조직 추가",
             notes = "새로운 조직을 추가한다.")
-    public Organization save(@RequestBody OrganizationSaveDto dto) {
+    public List<OrganizationFindDto> save(@RequestBody OrganizationSaveDto dto) {
         return organizationService.save(dto);
     }
 
@@ -30,8 +32,8 @@ public class OrganizationController {
     @ApiOperation(
             value = "조직도 조회",
             notes = "전체 조직 또는 일부 조직의 조직도를 조회한다.")
-    public Page<OrganizationFindDto> findAll(Long orgId, Pageable pageable) {
-        return organizationService.findAll(orgId, pageable);
+    public List<OrganizationFindDto> findAll(Long orgId) {
+        return organizationService.findAll(orgId);
     }
 
 //  조직원 조회

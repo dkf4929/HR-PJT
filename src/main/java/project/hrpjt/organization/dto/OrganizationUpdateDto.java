@@ -19,6 +19,4 @@ public class OrganizationUpdateDto {
     private String orgNo;
     private String orgNm;
     private Long parentId;
-    private List<Long> addEmpIds;
-    private List<Long> deleteEmpIds;
 }

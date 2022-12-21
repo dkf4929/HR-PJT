@@ -172,6 +172,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 "  from       organization d" +
                 "  inner join cte" +
                 "          on d.parent_id= cte.org_id" +
+                "  where sysdate() between d.start_date and d.end_date" +
                 ")" +
                 "  select     org_id," +
                 "              org_nm," +
@@ -185,6 +186,7 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
                 "             org_no" +
                 "  from       organization" +
                 "  where      org_id = case when :org_id is null then 1 else :org_id end" +
+                "    and      sysdate() between start_date and end_date" +
                 " union all" +
                 " select * from cte";
     }
