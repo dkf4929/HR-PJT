@@ -71,29 +71,6 @@ public class OrganizationServiceTest {
     }
 
     @Test
-    void save() {
-        List<String> orgNoList = new ArrayList<>();
-
-        orgNoList.add("000031");
-        orgNoList.add("000032");
-
-        OrganizationSaveDto hbm = OrganizationSaveDto.builder()
-                .orgNm("복리후생")
-                .parentOrgNo("000011")
-                .orgNo("000021")
-                .childOrgNo(orgNoList)
-                .startDate(LocalDate.now())
-                .build();
-
-        Organization hbmOrg = organizationService.save(hbm);
-        Organization organization1 = organizationRepository.findByOrgNo("000031").get();
-        Organization organization2 = organizationRepository.findByOrgNo("000032").get();
-
-        assertThat(organization1.getParent()).isEqualTo(hbmOrg);
-        assertThat(organization2.getParent()).isEqualTo(hbmOrg);
-    }
-
-    @Test
     @DisplayName("조직도 조회")
     void findAll() throws Exception {
 //        OrganizationFindParamDto dto = OrganizationFindParamDto.builder()
@@ -138,7 +115,7 @@ public class OrganizationServiceTest {
     @DisplayName("조직 폐쇄")
     void delete() throws Exception {
         OrganizationFindParamDto dto = OrganizationFindParamDto.builder()
-                .orgId(3L)
+                .orgId(8L)
                 .build();
 
         String value = objectMapper.writeValueAsString(dto);
@@ -153,7 +130,7 @@ public class OrganizationServiceTest {
         entityManager.flush();
         entityManager.clear();
 
-        Organization organization = organizationRepository.findById(3L).get();
+        Organization organization = organizationRepository.findById(8L).get();
         Set<Organization> children = organization.getChildren();
 
         assertThat(organization.getEndDate()).isEqualTo(LocalDate.now().minusDays(1));
