@@ -30,7 +30,7 @@ public class OrganizationService {
     private final EmployeeRepository employeeRepository;
     private final EntityManager entityManager;
 
-    public Organization save(OrganizationSaveDto dto) {
+    public List<OrganizationFindDto> save(OrganizationSaveDto dto) {
         Organization organization = dtoToEntity(dto);
 
         if (dto.getParentOrgNo() != null) {
@@ -47,14 +47,14 @@ public class OrganizationService {
             }
         }
 
-        return organizationRepository.save(organization);
+        Organization saveOrg = organizationRepository.save(organization);
+
+        return findAll(saveOrg.getId());
     }
 
 
-    public Page<OrganizationFindDto> findAll(Long orgId, Pageable pageable) {
-        List<OrganizationFindDto> list = organizationRepository.findAllOrg(orgId);
-
-        return new PageImpl<>(list, pageable, list.size());
+    public List<OrganizationFindDto> findAll(Long orgId) {
+        return organizationRepository.findAllOrg(orgId);
     }
 
     public Page<OrganizerFindDto> findOrganizerByParam(Pageable pageable) {
@@ -84,8 +84,6 @@ public class OrganizationService {
 
         return getOrganizerFindDtos(dto, pageable, organization, role);
     }
-
-
 
     public Page<OrganizationFindDto> close(OrganizationFindParamDto dto, Pageable pageable) {
         List<Organization> allChild = organizationRepository.findAllChild(dto.getOrgId());
@@ -161,36 +159,6 @@ public class OrganizationService {
                 dto.getOrgNm() != null || dto.getParentId() != null)) {
             throw new NoAuthorityException("해당 필드에 대한 수정 권한이 없습니다.");
         }
-
-        // 공통 권한.
-        if (dto.getAddEmpIds() != null) {
-            List<Employee> employees = employeeRepository.findAllById(dto.getAddEmpIds());
-
-            employees.forEach(e -> {
-                if (e.getOrganization() != null) {
-                    throw new IllegalStateException("조직에 소속되어 있는 직원이 있습니다. "); // 겸직 불가능함.
-                }
-            });
-
-            List<Employee> addEmpList = employeeRepository.findAllById(dto.getAddEmpIds());
-
-            addEmpList.stream().forEach(e -> {
-                organization.getEmployees().add(e); // 조직에 직원 추가
-                e.updateOrganization(organization); // 조직 정보 업데이트
-            });
-        }
-
-        if (dto.getDeleteEmpIds() != null) {
-            List<Employee> delEmpList = employeeRepository.findAllById(dto.getDeleteEmpIds());
-            Organization extOrg = organizationRepository.findById(8L).get(); // 발령대기 조직
-
-            delEmpList.stream().forEach(e -> {
-                organization.getEmployees().remove(e); // 직원 삭제
-                extOrg.getEmployees().add(e);
-                e.updateOrganization(organizationRepository.findById(8L).get());
-            });
-        }
-
 
         return findOrganizerByParam(pageable);
     }
