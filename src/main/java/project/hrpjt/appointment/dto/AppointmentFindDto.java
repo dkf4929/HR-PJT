@@ -1,9 +1,6 @@
 package project.hrpjt.appointment.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 import project.hrpjt.organization.entity.Organization;
@@ -12,6 +9,8 @@ import java.time.LocalDate;
 
 @NoArgsConstructor
 @Getter
+@EqualsAndHashCode
+@ToString
 public class AppointmentFindDto {
     private AppointmentType appointmentType;
     private AppointmentStatus appointmentStatus;
