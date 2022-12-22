@@ -92,27 +92,11 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("직원 삭제")
-    void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/employees")
-                        .param("empNo", "EMPLOYEE")
-                        .cookie(new Cookie("jwtToken", cookieValue.get()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(print());
-
-        assertThatThrownBy(() -> {
-            employeeRepository.findByEmpNo("EMPLOYEE").get();
-        }).isInstanceOf(NoSuchElementException.class);
-    }
-
-    @Test
     @DisplayName("직원 정보 수정")
     void update() throws Exception {
         EmployeeUpdateDto dto = EmployeeUpdateDto.builder()
                 .empNo("EMPLOYEE")
-                .orgNo("000010")
+                .role("ROLE_ORG_LEADER")
                 .build();
 
         String value = objectMapper.writeValueAsString(dto);
@@ -127,7 +111,7 @@ public class EmployeeServiceTest {
 
         Employee employee = employeeRepository.findByEmpNo("EMPLOYEE").get();
 
-        Assertions.assertThat(employee.getOrganization().getOrgNm()).isEqualTo("인사부");
+        Assertions.assertThat(employee.getRole()).isEqualTo("ROLE_ORG_LEADER");
 
     }
 
