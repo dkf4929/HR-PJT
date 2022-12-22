@@ -93,6 +93,7 @@ public class AppointmentService {
 
     private AppointmentFindDto getBuild(Appointment object) {
         return AppointmentFindDto.builder()
+                .appointmentId(object.getId())
                 .appointmentStatus(object.getAppointmentStatus())
                 .appointmentType(object.getAppointmentType())
                 .empNm(object.getEmployee().getEmpNm())
