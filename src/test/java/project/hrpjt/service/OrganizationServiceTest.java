@@ -86,8 +86,7 @@ public class OrganizationServiceTest {
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     JSONParser jsonParser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) jsonParser.parse(result.getResponse().getContentAsString(Charset.forName("UTF-8")));
-                    JSONArray array = (JSONArray) jsonObject.get("content");
+                    JSONArray array = (JSONArray) jsonParser.parse(result.getResponse().getContentAsString(Charset.forName("UTF-8")));
 
                     String orgNm = "";
 
