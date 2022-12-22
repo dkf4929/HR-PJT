@@ -82,9 +82,10 @@ public class EmployeeService {
             throw new NoSuchEmployeeException("존재하지 않는 사원입니다.");
         });
 
-        if (role.equals("SYS_ADMIN") && param.getRole() != null && param.getRole().equals("ORG_LEADER")) {
+        if (role.equals("ROLE_SYS_ADMIN") && param.getRole() != null && param.getRole().equals("ROLE_ORG_LEADER")) {
+            System.out.println("param = " + param.getRole());
             employee.updateRole(param.getRole());
-        } else if (role.equals("CEO") && param.getRole() != null && (param.getRole().equals("SYS_ADMIN") || param.getRole().equals("ORG_LEADER"))) {
+        } else if (role.equals("ROLE_CEO") && param.getRole() != null && (param.getRole().equals("ROLE_SYS_ADMIN") || param.getRole().equals("ROLE_ORG_LEADER"))) {
             employee.updateRole(param.getRole());
         }
 
