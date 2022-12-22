@@ -1,7 +1,5 @@
 package project.hrpjt.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -10,16 +8,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import project.hrpjt.employee.dto.EmployeeUpdateDto;
+import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.organization.dto.*;
 import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
@@ -29,10 +29,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.Cookie;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.*;
@@ -42,72 +39,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @Transactional
 public class OrganizationServiceTest {
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    OrganizationService organizationService;
-    @Autowired
-    OrganizationRepository organizationRepository;
-    @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
-    EntityManager entityManager;
-
-    AtomicReference<String> cookieValue = new AtomicReference<>("");
+    @Autowired OrganizationService organizationService;
+    @Autowired UserDetailsService userDetailsService;
+    @Autowired OrganizationRepository organizationRepository;
+    @Autowired EntityManager entityManager;
 
     @BeforeEach
     void each() throws Exception {
-        mockMvc.perform(post("/login")
-                        .param("empNo", "ADMIN")  // admin 권한으로 로그인
-                        .param("password", "1234")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(result -> Arrays.stream(result.getResponse().getCookies())
-                        .filter((c) -> c.getName().equals("jwtToken"))
-                        .forEach((c) -> cookieValue.set(c.getValue())));   // result에서 쿠키값 추출
+        UserDetails userDetails = userDetailsService.loadUserByUsername("ADMIN");
+        userDetails.getAuthorities();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
     @DisplayName("조직도 조회")
     void findAll() throws Exception {
-//        OrganizationFindParamDto dto = OrganizationFindParamDto.builder()
-//                .orgId(3L)
-//                .build();
-//
-//        String value = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(get("/role_emp/organization")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("orgId", "3")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("jwtToken", cookieValue.get())))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    JSONParser jsonParser = new JSONParser();
-                    JSONArray array = (JSONArray) jsonParser.parse(result.getResponse().getContentAsString(Charset.forName("UTF-8")));
+        List<OrganizationFindDto> list = organizationService.findAll(3L);
+        Set<Organization> children = new HashSet<>();
 
-                    String orgNm = "";
-
-                    for (int i = 0; i < array.size(); i++) {
-                        JSONObject obj = (JSONObject) array.get(i);
-                        orgNm = (String) obj.get("orgNm");
-                    }
-
-                    assertThat(orgNm).isEqualTo("총무부");
-                });
+        children.stream().forEach(c -> {
+            assertThat(c.getParent().getId()).isEqualTo(3L);
+        });
     }
 
     @Test
     @DisplayName("조직원 조회")
     void findOrganizer() throws Exception {
-        mockMvc.perform(get("/role_emp/organization/employees")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("jwtToken", cookieValue.get())))
-                .andExpect(status().isOk())
-                .andDo(print());
+        Page<OrganizerFindDto> organizer = organizationService.findOrganizerByParam(PageRequest.of(1, 50));
+
+        System.out.println("size() = " + organizer.getContent().size());
     }
 
     @Test
@@ -117,14 +81,7 @@ public class OrganizationServiceTest {
                 .orgId(8L)
                 .build();
 
-        String value = objectMapper.writeValueAsString(dto);
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/role_adm/organization")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(value)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("jwtToken", cookieValue.get())))
-                .andExpect(status().isOk());
+        organizationService.close(dto, PageRequest.of(1, 50));
 
         entityManager.flush();
         entityManager.clear();
@@ -151,14 +108,7 @@ public class OrganizationServiceTest {
                 .parentId(2L)
                 .build();
 
-        String value = objectMapper.writeValueAsString(dto);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/role_lead/organization")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(value)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("jwtToken", cookieValue.get())))
-                .andExpect(status().isOk());
+        organizationService.edit(dto, PageRequest.of(1, 50));
 
         Organization findOrg = organizationRepository.findById(3L).get();
         Set<Organization> children = findOrg.getChildren();
