@@ -12,17 +12,23 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uniqueDayOff", columnNames = {"employee_id", "year"})
+        }
+)
 public class DayOff extends SubEntity {
     @Id @GeneratedValue
     @Column(name = "dayoff_id")
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "employeeId")
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    private int annualDayOff;
-    private int specialDayOff;
+    private int year;
+    private double annualDayOff;
+    private double specialDayOff;
 
     @Builder
     public DayOff(Employee employee, Attendance attendance) {
@@ -33,6 +39,7 @@ public class DayOff extends SubEntity {
 
     private void createLeave(Employee employee, Attendance attendance) {
         int workYear = attendance.getYear() - employee.getHireDate().getYear();
+        this.year = attendance.getYear() + 1; // 이전년도 근태 기준으로 연차 생성.
 
         if (workYear >= 2 && workYear < 4) { // 2,3년 차는 연차 16일
             annualDayOff = 16;
@@ -52,7 +59,7 @@ public class DayOff extends SubEntity {
             annualDayOff = 15;
         }
 
-        int minusDays = 0;
+        double minusDays = 0;
 
         if (attendance.getTardy() > 0) {
             minusDays = attendance.getTardy() / 3; // 지각 3회 -> 연차 -1일
@@ -67,5 +74,13 @@ public class DayOff extends SubEntity {
         }
 
         annualDayOff = annualDayOff - minusDays;
+    }
+
+    public void updateAnnualDayOff(double annualDayOff) {
+        this.annualDayOff = annualDayOff;
+    }
+
+    public void updateSpecialDayOff(double specialDayOff) {
+        this.specialDayOff = specialDayOff;
     }
 }
