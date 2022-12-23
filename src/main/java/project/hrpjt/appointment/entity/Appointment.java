@@ -6,13 +6,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
+import project.hrpjt.appointment.entity.enumeration.ApprovementStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.organization.entity.Organization;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
@@ -24,7 +23,7 @@ import java.time.LocalDate;
                 @UniqueConstraint(name = "UniqueEndDateAndType", columnNames = {"appointmentType", "endDate", "employee_id", "startDate"})
         }
 )
-@ToString(of = {"appointmentType", "appointmentStatus", "startDate", "endDate"})
+@ToString(of = {"appointmentType", "approvementStatus", "startDate", "endDate"})
 public class Appointment {
     @Id
     @GeneratedValue
@@ -35,7 +34,7 @@ public class Appointment {
     private AppointmentType appointmentType;
 
     @Enumerated(EnumType.STRING)
-    private AppointmentStatus appointmentStatus;
+    private ApprovementStatus approvementStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
@@ -53,11 +52,11 @@ public class Appointment {
     private LocalDate endDate;
 
     @Builder
-    public Appointment(AppointmentType appointmentType, AppointmentStatus appointmentStatus, Employee employee, Organization transOrg, LocalDate startDate, LocalDate endDate) {
-        if (appointmentStatus == null) {
-            this.appointmentStatus = AppointmentStatus.LEADER_PENDING_APPR;
+    public Appointment(AppointmentType appointmentType, ApprovementStatus approvementStatus, Employee employee, Organization transOrg, LocalDate startDate, LocalDate endDate) {
+        if (approvementStatus == null) {
+            this.approvementStatus = ApprovementStatus.LEADER_PENDING_APPR;
         } else {
-            this.appointmentStatus = appointmentStatus;
+            this.approvementStatus = approvementStatus;
         }
         this.appointmentType = appointmentType;
         this.employee = employee;
@@ -66,8 +65,8 @@ public class Appointment {
         this.endDate = endDate;
     }
 
-    public void updateAppointmentStatus(AppointmentStatus appointmentStatus) {
-        this.appointmentStatus = appointmentStatus;
+    public void updateApprovementStatus(ApprovementStatus approvementStatus) {
+        this.approvementStatus = approvementStatus;
     }
 
     public void updateEndDate(LocalDate endDate) {

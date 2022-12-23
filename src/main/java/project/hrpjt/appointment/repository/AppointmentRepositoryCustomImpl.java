@@ -5,13 +5,10 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import project.hrpjt.appointment.dto.AppointmentFindDto;
-import project.hrpjt.appointment.dto.AppointmentParamDto;
 import project.hrpjt.appointment.entity.Appointment;
 import project.hrpjt.appointment.entity.QAppointment;
 import project.hrpjt.employee.entity.Employee;
-import project.hrpjt.employee.entity.QEmployee;
 import project.hrpjt.organization.dto.OrganizationFindDto;
-import project.hrpjt.organization.dto.OrganizationFindParamDto;
 import project.hrpjt.organization.repository.OrganizationRepository;
 
 import javax.persistence.EntityManager;
@@ -22,7 +19,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static project.hrpjt.appointment.entity.QAppointment.appointment;
-import static project.hrpjt.employee.entity.QEmployee.*;
 
 public class AppointmentRepositoryCustomImpl implements AppointmentRepositoryCustom {
     private final EntityManager entityManager;
@@ -110,14 +106,14 @@ public class AppointmentRepositoryCustomImpl implements AppointmentRepositoryCus
                 .leftJoin(appointment.transOrg).fetchJoin()
                 .leftJoin(appointment.employee).fetchJoin()
                 .where(appointment.appointmentType.stringValue().eq("ORG")
-                        .and(appointment.appointmentStatus.stringValue().eq("APPR"))
+                        .and(appointment.approvementStatus.stringValue().eq("APPR"))
                         .and(appointment.endDate.eq(LocalDate.of(2999, 12, 31)))
                         .and(appointment.startDate.eq(JPAExpressions
                                 .select(sub.startDate.min())
                                 .distinct()
                                 .from(sub)
                                 .where(sub.employee.id.eq(empId)
-                                        .and(sub.appointmentStatus.stringValue().eq("APPR"))
+                                        .and(sub.approvementStatus.stringValue().eq("APPR"))
                                         .and(sub.appointmentType.stringValue().eq("ORG"))
                                         .and(sub.endDate.eq(LocalDate.of(2999, 12, 31))))))
                         .and(appointment.employee.id.eq(empId))
@@ -137,7 +133,7 @@ public class AppointmentRepositoryCustomImpl implements AppointmentRepositoryCus
                     .from(appointment)
                     .join(appointment.employee).fetchJoin()
                     .leftJoin(appointment.transOrg).fetchJoin()
-                    .where(authCheck(employee, orgIds).and(appointment.appointmentStatus.stringValue().eq("LEADER_PENDING_APPR")))
+                    .where(authCheck(employee, orgIds).and(appointment.approvementStatus.stringValue().eq("LEADER_PENDING_APPR")))
                     .fetch();
         } else {  // 시스템 관리자 / ceo 승인 리스트
             object = queryFactory
@@ -145,7 +141,7 @@ public class AppointmentRepositoryCustomImpl implements AppointmentRepositoryCus
                     .from(appointment)
                     .join(appointment.employee).fetchJoin()
                     .leftJoin(appointment.transOrg).fetchJoin()
-                    .where(appointment.appointmentStatus.stringValue().eq("CEO_PENDING_APPR"))
+                    .where(appointment.approvementStatus.stringValue().eq("CEO_PENDING_APPR"))
                     .fetch();
         }
 
@@ -184,7 +180,7 @@ public class AppointmentRepositoryCustomImpl implements AppointmentRepositoryCus
                             .appointmentType(o.getAppointmentType())
                             .startDate(o.getStartDate())
                             .transOrg(o.getTransOrg())
-                            .appointmentStatus(o.getAppointmentStatus())
+                            .approvementStatus(o.getApprovementStatus())
                             .endDate(o.getEndDate())
                             .empNm(o.getEmployee().getEmpNm())
                             .empNo(o.getEmployee().getEmpNo())

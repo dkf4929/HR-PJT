@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
+import project.hrpjt.appointment.entity.enumeration.ApprovementStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 
 import java.time.LocalDate;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Builder
 public class AppointmentSaveDto {
     private AppointmentType type;
-    private AppointmentStatus status;   // testdata용
+    private ApprovementStatus status;   // testdata용
     private String empNo;
     private String orgNo;
     private LocalDate startDate;
