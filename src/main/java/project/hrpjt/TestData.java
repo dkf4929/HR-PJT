@@ -22,6 +22,8 @@ import project.hrpjt.dayoff.repository.DayOffRepository;
 import project.hrpjt.employee.dto.EmployeeSaveDto;
 import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.employee.service.EmployeeService;
+import project.hrpjt.holiday.entity.Holidays;
+import project.hrpjt.holiday.repository.HolidayRepository;
 import project.hrpjt.organization.dto.OrganizationSaveDto;
 import project.hrpjt.organization.service.OrganizationService;
 
@@ -37,6 +39,7 @@ public class TestData {
     private final AttendanceRepository attendanceRepository;
     private final DayOffRepository dayOffRepository;
     private final EntityManager entityManager;
+    private final HolidayRepository holidayRepository;
 
     @PostConstruct
     @Transactional
@@ -254,7 +257,7 @@ public class TestData {
         AppointmentSaveDto app8 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
                 .status(ApprovementStatus.APPR)
-                .orgNo("000020")
+                .orgNo("000030")
                 .startDate(LocalDate.of(2022, 01, 01))
                 .empNo("EMPLOYEE")
                 .build();
@@ -297,5 +300,11 @@ public class TestData {
         appointmentService.approve(35L, null);
         appointmentService.approve(36L, null);
         appointmentService.approve(38L, null);
+
+        holidayRepository.save(Holidays.builder().holiday(LocalDate.of(2022, 12, 30)).reason("종무식").build());
+        holidayRepository.save(Holidays.builder().holiday(LocalDate.of(2023, 01, 02)).reason("창립기념일").build());
+        holidayRepository.save(Holidays.builder().holiday(LocalDate.of(2023, 01, 21)).reason("설날 연휴").build());
+        holidayRepository.save(Holidays.builder().holiday(LocalDate.of(2023, 01, 22)).reason("설날").build());
+        holidayRepository.save(Holidays.builder().holiday(LocalDate.of(2023, 01, 23)).reason("설날 연휴").build());
     }
 }
