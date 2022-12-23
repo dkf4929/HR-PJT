@@ -2,7 +2,7 @@ package project.hrpjt.appointment.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
+import project.hrpjt.appointment.entity.enumeration.ApprovementStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 import project.hrpjt.organization.entity.Organization;
 
@@ -17,7 +17,7 @@ public class AppointmentFindDto {
     private Long appointmentId;
 
     private AppointmentType appointmentType;
-    private AppointmentStatus appointmentStatus;
+    private ApprovementStatus approvementStatus;
     private String empNo;
     private String empNm;
     private String transOrgNo;
@@ -26,10 +26,10 @@ public class AppointmentFindDto {
     private LocalDate endDate;
 
     @Builder
-    public AppointmentFindDto(Long appointmentId, AppointmentType appointmentType, AppointmentStatus appointmentStatus, String empNo, String empNm, Organization transOrg, LocalDate startDate, LocalDate endDate) {
+    public AppointmentFindDto(Long appointmentId, AppointmentType appointmentType, ApprovementStatus approvementStatus, String empNo, String empNm, Organization transOrg, LocalDate startDate, LocalDate endDate) {
         this.appointmentId = appointmentId;
         this.appointmentType = appointmentType;
-        this.appointmentStatus = appointmentStatus;
+        this.approvementStatus = approvementStatus;
         this.empNo = empNo;
         this.empNm = empNm;
         if (transOrg != null) {

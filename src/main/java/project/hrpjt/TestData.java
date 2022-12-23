@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.appointment.dto.AppointmentSaveDto;
-import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
+import project.hrpjt.appointment.entity.enumeration.ApprovementStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 import project.hrpjt.appointment.service.AppointmentService;
 import project.hrpjt.attendance.entity.Attendance;
@@ -23,7 +23,6 @@ import project.hrpjt.employee.dto.EmployeeSaveDto;
 import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.employee.service.EmployeeService;
 import project.hrpjt.organization.dto.OrganizationSaveDto;
-import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.service.OrganizationService;
 
 import java.time.LocalDate;
@@ -198,7 +197,7 @@ public class TestData {
         AppointmentSaveDto app1 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
                 .orgNo("000030")
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .startDate(LocalDate.of(1990, 01, 01))
                 .empNo("ADMIN")
                 .endDate(LocalDate.of(1994,12,30))
@@ -206,7 +205,7 @@ public class TestData {
 
         AppointmentSaveDto app2 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .orgNo("000020")
                 .startDate(LocalDate.of(1995, 01, 01))
 //                .endDate(LocalDate.of(1999,12,30))
@@ -215,7 +214,7 @@ public class TestData {
 
         AppointmentSaveDto app3 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .orgNo("000010")
                 .startDate(LocalDate.of(2000, 01, 01))
                 .empNo("ADMIN")
@@ -223,7 +222,7 @@ public class TestData {
 
         AppointmentSaveDto app4 = AppointmentSaveDto.builder()
                 .type(AppointmentType.DISEASE_LEAVE)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .startDate(LocalDate.of(2010, 03, 01))
                 .endDate(LocalDate.of(2010, 03, 04))
                 .empNo("ADMIN")
@@ -231,14 +230,14 @@ public class TestData {
 
         AppointmentSaveDto app5 = AppointmentSaveDto.builder()
                 .type(AppointmentType.RETURN)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .startDate(LocalDate.of(2010, 03, 05))
                 .empNo("ADMIN")
                 .build();
 
         AppointmentSaveDto app6 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .orgNo("000001")
                 .startDate(LocalDate.of(1980, 01, 01))
                 .empNo("CEO")
@@ -246,7 +245,7 @@ public class TestData {
 
         AppointmentSaveDto app7 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .orgNo("000020")
                 .startDate(LocalDate.of(1997, 01, 01))
                 .empNo("ORG_LEADER")
@@ -254,7 +253,7 @@ public class TestData {
 
         AppointmentSaveDto app8 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .orgNo("000020")
                 .startDate(LocalDate.of(2022, 01, 01))
                 .empNo("EMPLOYEE")
@@ -270,7 +269,7 @@ public class TestData {
 
         AppointmentSaveDto app10 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
-                .status(AppointmentStatus.APPR)
+                .status(ApprovementStatus.APPR)
                 .orgNo("000011")
                 .startDate(LocalDate.of(1998, 01, 01))
                 .empNo("LEADER2")

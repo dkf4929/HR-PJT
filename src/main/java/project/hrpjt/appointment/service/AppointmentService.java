@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.appointment.dto.AppointmentFindDto;
 import project.hrpjt.appointment.dto.AppointmentSaveDto;
 import project.hrpjt.appointment.entity.Appointment;
-import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
+import project.hrpjt.appointment.entity.enumeration.ApprovementStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 import project.hrpjt.appointment.repository.AppointmentRepository;
 import project.hrpjt.employee.entity.Employee;
@@ -43,7 +43,7 @@ public class AppointmentService {
         Appointment save = appointmentRepository.save(Appointment.builder()
                 .appointmentType(param.getType())
                 .transOrg(transOrg)
-                .appointmentStatus(param.getStatus())
+                .approvementStatus(param.getStatus())
                 .employee(employee)
                 .startDate(param.getStartDate())
                 .endDate(param.getEndDate())
@@ -94,7 +94,7 @@ public class AppointmentService {
     private AppointmentFindDto getBuild(Appointment object) {
         return AppointmentFindDto.builder()
                 .appointmentId(object.getId())
-                .appointmentStatus(object.getAppointmentStatus())
+                .approvementStatus(object.getApprovementStatus())
                 .appointmentType(object.getAppointmentType())
                 .empNm(object.getEmployee().getEmpNm())
                 .empNo(object.getEmployee().getEmpNo())
@@ -108,10 +108,10 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findByIdFetch(appId).orElseThrow();  // 발령 정보 추출
 
         if (role.equals("ROLE_ORG_LEADER")) {
-            appointment.updateAppointmentStatus(AppointmentStatus.CEO_PENDING_APPR); // 조직장 승인 (CEO 승인 대기) 상태로 변경
+            appointment.updateApprovementStatus(ApprovementStatus.CEO_PENDING_APPR); // 조직장 승인 (CEO 승인 대기) 상태로 변경
         } else {
             if (appointment.getTransOrg() != null && (role.equals("ROLE_SYS_ADMIN")) || role.equals("ROLE_CEO")) {  // 조직 이동 발령이면 직전 조직 발령 찾아서 endDate를 업데이트.
-                appointment.updateAppointmentStatus(AppointmentStatus.APPR);
+                appointment.updateApprovementStatus(ApprovementStatus.APPR);
                 Employee employee = appointment.getEmployee();
 
                 if (appointmentRepository.findOrgCount(appointment.getEmployee().getId()) > 1) {  // 이전 조직 발령이 존재할 경우
@@ -126,7 +126,7 @@ public class AppointmentService {
                 appointment.getTransOrg().getEmployees().add(appointment.getEmployee());   // 조직에 해당 발령대상자를 추가
                 employee.updateOrganization(appointment.getTransOrg());  // 조직 업데이트
             } else {
-                appointment.updateAppointmentStatus(AppointmentStatus.APPR); // 승인 처리
+                appointment.updateApprovementStatus(ApprovementStatus.APPR); // 승인 처리
 
                 /* 퇴사 시 처리 - 이전 조직발령의 종료일을 오늘날짜 -1일
                  * 직원 엔터티의 조직 null로 업데이트.

@@ -8,31 +8,24 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import project.hrpjt.appointment.dto.AppointmentFindDto;
 import project.hrpjt.appointment.dto.AppointmentSaveDto;
 import project.hrpjt.appointment.entity.Appointment;
-import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
+import project.hrpjt.appointment.entity.enumeration.ApprovementStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 import project.hrpjt.appointment.repository.AppointmentRepository;
 import project.hrpjt.appointment.service.AppointmentService;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.Cookie;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -105,7 +98,7 @@ public class AppointmentServiceTest {
         appointmentService.approve(23L, PageRequest.of(1, 10));
 
         Appointment appointment = appointmentRepository.findById(23L).get();
-        assertThat(appointment.getAppointmentStatus()).isEqualTo(AppointmentStatus.CEO_PENDING_APPR); // CEO 승인대기 상태로 변경.
+        assertThat(appointment.getApprovementStatus()).isEqualTo(ApprovementStatus.CEO_PENDING_APPR); // CEO 승인대기 상태로 변경.
 
         // 시스템 관리자 권한으로 로그인
         each();
@@ -113,7 +106,7 @@ public class AppointmentServiceTest {
         appointmentService.approve(23L, PageRequest.of(1, 10)); // 시스템 관리자 조직 이동 발령 승인
 
         Appointment appr = appointmentRepository.findById(23L).get();
-        assertThat(appr.getAppointmentStatus()).isEqualTo(AppointmentStatus.APPR); // 최종승인 상태로 변경.
+        assertThat(appr.getApprovementStatus()).isEqualTo(ApprovementStatus.APPR); // 최종승인 상태로 변경.
 
         assertThat(appr.getTransOrg()).isEqualTo(appr.getEmployee().getOrganization()); // 최종 승인된 조직과 직원 엔터티의 조직이 같은지 확인.
         assertThat(appr.getTransOrg().getEmployees()).contains(appr.getEmployee());  // 조직 엔터티에 발령된 직원이 포함되어 있는지 확인.
