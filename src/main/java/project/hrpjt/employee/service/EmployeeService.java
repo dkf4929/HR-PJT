@@ -83,7 +83,6 @@ public class EmployeeService {
         });
 
         if (role.equals("ROLE_SYS_ADMIN") && param.getRole() != null && param.getRole().equals("ROLE_ORG_LEADER")) {
-            System.out.println("param = " + param.getRole());
             employee.updateRole(param.getRole());
         } else if (role.equals("ROLE_CEO") && param.getRole() != null && (param.getRole().equals("ROLE_SYS_ADMIN") || param.getRole().equals("ROLE_ORG_LEADER"))) {
             employee.updateRole(param.getRole());
@@ -124,7 +123,7 @@ public class EmployeeService {
                 .password(encoder.encode(param.getPassword()))
                 .empNm(param.getEmpNm())
                 .kakaoMail(param.getKakaoMail())
-                .hireDate(LocalDate.now())
+                .hireDate(param.getHireDate())
                 .kakaoId(param.getKakaoId())
                 .role(param.getRole())
                 .birthDate(param.getBirthDate())
