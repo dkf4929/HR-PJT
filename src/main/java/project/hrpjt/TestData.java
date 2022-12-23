@@ -249,7 +249,7 @@ public class TestData {
         AppointmentSaveDto app7 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
                 .status(ApprovementStatus.APPR)
-                .orgNo("000020")
+                .orgNo("000010")
                 .startDate(LocalDate.of(1997, 01, 01))
                 .empNo("ORG_LEADER")
                 .build();
