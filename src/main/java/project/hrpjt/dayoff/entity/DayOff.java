@@ -8,7 +8,6 @@ import project.hrpjt.base.SubEntity;
 import project.hrpjt.employee.entity.Employee;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -22,8 +21,8 @@ public class DayOff extends SubEntity {
     @JoinColumn(name = "employeeId")
     private Employee employee;
 
-    private int annualLeave;
-    private int specialLeave;
+    private int annualDayOff;
+    private int specialDayOff;
 
     @Builder
     public DayOff(Employee employee, Attendance attendance) {
@@ -36,21 +35,21 @@ public class DayOff extends SubEntity {
         int workYear = attendance.getYear() - employee.getHireDate().getYear();
 
         if (workYear >= 2 && workYear < 4) { // 2,3년 차는 연차 16일
-            annualLeave = 16;
+            annualDayOff = 16;
         } else if (workYear >= 4 && workYear < 6) { // 4,5년차 연차 18일
-            annualLeave = 18;
+            annualDayOff = 18;
         } else if (workYear > 6) { // 6년차 이상 연차 20일
-            annualLeave = 20;
+            annualDayOff = 20;
 
             if (workYear == 10) { // 근속 10년 특별 휴가 5일
-                specialLeave = 5;
+                specialDayOff = 5;
             } else if (workYear == 10) { // 근속 20년 특별 휴가 10일
-                specialLeave = 10;
+                specialDayOff = 10;
             } else if (workYear == 20) {
-                specialLeave = 15;
+                specialDayOff = 15;
             }
         } else {
-            annualLeave = 15;
+            annualDayOff = 15;
         }
 
         int minusDays = 0;
@@ -67,6 +66,6 @@ public class DayOff extends SubEntity {
             minusDays += attendance.getLeaveEarly() / 3; // 조퇴 3번 -> 연차 -1일
         }
 
-        annualLeave = annualLeave - minusDays;
+        annualDayOff = annualDayOff - minusDays;
     }
 }
