@@ -1,21 +1,26 @@
 package project.hrpjt;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
-import project.hrpjt.appointment.dto.AppointmentFindDto;
 import project.hrpjt.appointment.dto.AppointmentSaveDto;
 import project.hrpjt.appointment.entity.enumeration.AppointmentStatus;
 import project.hrpjt.appointment.entity.enumeration.AppointmentType;
 import project.hrpjt.appointment.service.AppointmentService;
+import project.hrpjt.attendance.entity.Attendance;
+import project.hrpjt.attendance.repository.AttendanceRepository;
+import project.hrpjt.dayoff.entity.DayOff;
+import project.hrpjt.dayoff.repository.DayOffRepository;
 import project.hrpjt.employee.dto.EmployeeSaveDto;
+import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.employee.service.EmployeeService;
 import project.hrpjt.organization.dto.OrganizationSaveDto;
 import project.hrpjt.organization.entity.Organization;
@@ -30,6 +35,9 @@ public class TestData {
     private final OrganizationService organizationService;
     private final AppointmentService appointmentService;
     private final UserDetailsService userDetailsService;
+    private final AttendanceRepository attendanceRepository;
+    private final DayOffRepository dayOffRepository;
+    private final EntityManager entityManager;
 
     @PostConstruct
     @Transactional
@@ -164,12 +172,28 @@ public class TestData {
                 .password("1234")
                 .build();
 
-        employeeService.save(admin);
-        employeeService.save(ceo);
-        employeeService.save(employee);
-        employeeService.save(employee2);
-        employeeService.save(leader);
-        employeeService.save(leader2);
+        Employee save = employeeService.save(admin);
+        Employee save1 = employeeService.save(ceo);
+        Employee save2 = employeeService.save(employee);
+        Employee save3 = employeeService.save(employee2);
+        Employee save4 = employeeService.save(leader);
+        Employee save5 = employeeService.save(leader2);
+
+        Attendance attend1 = attendanceRepository.save(Attendance.builder().absenteeism(1).year(2022).tardy(5).leaveEarly(4).employee(save5).build());
+        Attendance attend2 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2022).tardy(2).leaveEarly(4).employee(save4).build());
+        Attendance attend3 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2022).tardy(2).leaveEarly(0).employee(save2).build());
+        Attendance attend4 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2022).tardy(3).leaveEarly(7).employee(save1).build());
+        Attendance attend5 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2022).tardy(0).leaveEarly(0).employee(save).build());
+        Attendance attend6 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2021).tardy(2).leaveEarly(0).employee(save).build());
+        Attendance attend7 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2020).tardy(0).leaveEarly(3).employee(save).build());
+
+        dayOffRepository.save(DayOff.builder().attendance(attend1).employee(attend1.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend2).employee(attend2.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend3).employee(attend3.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend4).employee(attend4.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend5).employee(attend5.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend6).employee(attend6.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend7).employee(attend7.getEmployee()).build());
 
         AppointmentSaveDto app1 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
@@ -269,10 +293,10 @@ public class TestData {
         appointmentService.save(app9);
         appointmentService.save(app10);
 
-        appointmentService.approve(17L, null);
-        appointmentService.approve(20L, null);
-        appointmentService.approve(21L, null);
-        appointmentService.approve(22L, null);
-        appointmentService.approve(24L, null);
+        appointmentService.approve(31L, null);
+        appointmentService.approve(34L, null);
+        appointmentService.approve(35L, null);
+        appointmentService.approve(36L, null);
+        appointmentService.approve(38L, null);
     }
 }
