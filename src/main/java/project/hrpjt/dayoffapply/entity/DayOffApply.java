@@ -3,6 +3,7 @@ package project.hrpjt.dayoffapply.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import project.hrpjt.appointment.entity.enumeration.ApprovementStatus;
 import project.hrpjt.dayoffapply.entity.enumeration.DayOffType;
 import project.hrpjt.employee.entity.Employee;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
                 @UniqueConstraint(name = "uniqueDayOffApply", columnNames = {"employee_id", "startDate", "endDate"})
         }
 )
+@ToString(of = {"dayOffType", "startDate", "endDate", "minusDays", "thisYearMinusDays", "lastYearMinusDays"})
 public class DayOffApply {
     @Id
     @GeneratedValue
@@ -40,16 +42,23 @@ public class DayOffApply {
     @Column(nullable = false)
     private double minusDays;
 
+    private double thisYearMinusDays;
+    private double lastYearMinusDays;
+
     @Enumerated(EnumType.STRING)
     private ApprovementStatus status;
 
     @Builder
-    public DayOffApply(Employee employee, DayOffType dayOffType, LocalDate startDate, LocalDate endDate, ApprovementStatus status, double minusDays) {
+    public DayOffApply(Employee employee, DayOffType dayOffType, LocalDate startDate,
+                       LocalDate endDate, ApprovementStatus status, double minusDays,
+                       double thisYearMinusDays, double lastYearMinusDays) {
         this.employee = employee;
         this.dayOffType = dayOffType;
         this.startDate = startDate;
         this.endDate = endDate;
         this.minusDays = minusDays;
+        this.thisYearMinusDays = thisYearMinusDays;
+        this.lastYearMinusDays = lastYearMinusDays;
 
         if (status == null) {
             this.status = ApprovementStatus.LEADER_PENDING_APPR;

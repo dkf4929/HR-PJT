@@ -23,6 +23,7 @@ import project.hrpjt.organization.dto.OrganizationFindDto;
 import project.hrpjt.organization.repository.OrganizationRepository;
 
 import java.sql.Date;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -102,6 +103,8 @@ public class DayOffApplyService {
         String role = loginEmp.getRole();
         DayOffApply apply = dayOffApplyRepository.findById(id).orElseThrow();
 
+        System.out.println("apply = " + apply);
+
         if (role.equals("ROLE_ORG_LEADER")) {
             apply.updateStatus(ApprovementStatus.CEO_PENDING_APPR); // ceo 승인대기 상태로 변경
         } else {
@@ -117,13 +120,22 @@ public class DayOffApplyService {
             }
 
             List<DayOff> myDayOff = dayOffRepository.findMyDayOff(apply.getEmployee(), years);
-            myDayOff.forEach(d -> {
-                if (apply.getDayOffType().equals(DayOffType.SPECIAL_DAY_OFF)) {
-                    d.updateSpecialDayOff(d.getSpecialDayOff() - apply.getMinusDays());
-                } else {
-                    d.updateAnnualDayOff(d.getAnnualDayOff() - apply.getMinusDays());
+
+            if (myDayOff.size() > 1) {
+                if (apply.getDayOffType().equals(DayOffType.ANNUAL_DAY_OFF)) {
+                    myDayOff.get(0).updateAnnualDayOff(myDayOff.get(0).getAnnualDayOff() - apply.getLastYearMinusDays());
+                    myDayOff.get(1).updateAnnualDayOff(myDayOff.get(1).getAnnualDayOff() - apply.getThisYearMinusDays());
+                } else if (apply.getDayOffType().equals(DayOffType.SPECIAL_DAY_OFF)) {
+                    myDayOff.get(0).updateSpecialDayOff(myDayOff.get(0).getSpecialDayOff() - apply.getLastYearMinusDays());
+                    myDayOff.get(1).updateSpecialDayOff(myDayOff.get(1).getSpecialDayOff() - apply.getThisYearMinusDays());
                 }
-            });
+            } else {
+                if (apply.getDayOffType().equals(DayOffType.SPECIAL_DAY_OFF)) {
+                    myDayOff.get(0).updateSpecialDayOff(myDayOff.get(0).getSpecialDayOff() - apply.getMinusDays());
+                } else {
+                    myDayOff.get(0).updateAnnualDayOff(myDayOff.get(0).getAnnualDayOff() - apply.getMinusDays());
+                }
+            }
         }
     }
 
@@ -148,16 +160,17 @@ public class DayOffApplyService {
 
         List<DayOff> myDayOff = dayOffRepository.findMyDayOff(loginEmp, years);
 
+        // 보상 휴가 또는 연차일 경우
         if (param.getDayOffType().equals(DayOffType.SPECIAL_DAY_OFF) || param.getDayOffType().equals(DayOffType.ANNUAL_DAY_OFF)) {
             if (param.getStartDate().getYear() == param.getEndDate().getYear()) {
-                minusDays = Period.between(param.getStartDate(), param.getEndDate()).getDays() + 1;
+                minusDays = Duration.between(param.getStartDate().atStartOfDay(), param.getEndDate().atStartOfDay()).toDays() + 1; // 올해 차감일수 계산
                 lastMinusDays = 0;
             } else { // 휴가가 이전년도에서 다음년도까지 이어질 경우
                 LocalDate startDate = param.getStartDate();
                 LocalDate endDate = param.getEndDate();
 
-                lastMinusDays = Period.between(startDate, startDate.withDayOfMonth(startDate.lengthOfMonth())).getDays() + 1;
-                minusDays = Period.between(endDate.withDayOfMonth(1), endDate).getDays() + 1;
+                lastMinusDays = Duration.between(startDate.atStartOfDay(), startDate.withDayOfMonth(startDate.lengthOfMonth()).atStartOfDay()).toDays() + 1;
+                minusDays = Duration.between(LocalDate.of(endDate.getYear(), 1, 1).atStartOfDay(), endDate.atStartOfDay()).toDays() + 1;
             }
         } else {
             if (!param.getStartDate().equals(param.getEndDate())) {
@@ -168,7 +181,7 @@ public class DayOffApplyService {
             lastMinusDays = 0;
         }
 
-        // 주말 또는 휴일 관리 테이블에 등록된 날짜 인지 확인.
+        // 휴일 관리 테이블에서 주말 또는 휴일(대체휴일, 공휴일, 창립기념일 등)을 조회하여 휴일을 제외한 연차감산일 계산
         for (LocalDate date = param.getStartDate(); date.isBefore(param.getEndDate().plusDays(1)); date = date.plusDays(1)) {
             if (isWeekend(date) || holidays.contains(date)) {
                 if (date.getYear() != param.getEndDate().getYear()) { // 올해 차감일수인지 작년 차감일수인지에 따른 처리
@@ -184,24 +197,25 @@ public class DayOffApplyService {
             throw new IllegalStateException("감산일이 0일 입니다.");
         }
 
-        if (lastMinusDays > 0) {
+        if (lastMinusDays > 0) { // 신청 휴가가 전년도와 올해에 걸쳐 있는 경우 ex -> 2022-12-30 ~ 2023-01-03
+            // 작년 또는 올해 연차 갯수에 따른 처리
             if (param.getDayOffType().equals(DayOffType.ANNUAL_DAY_OFF)) {
                 if (myDayOff.get(0).getAnnualDayOff() - lastMinusDays < 0 || myDayOff.get(1).getAnnualDayOff() - minusDays < 0) {
-                    throw new IllegalStateException("작년 또는 올해 연차를 모두 소진하였습니다.");
+                    throw new IllegalStateException("작년 또는 올해 연차 갯수가 부족합니다.");
                 }
             } else {
                 if (myDayOff.get(0).getSpecialDayOff() - lastMinusDays < 0 || myDayOff.get(1).getSpecialDayOff() - minusDays < 0) {
-                    throw new IllegalStateException("작년 또는 올해 연차를 모두 소진하였습니다.");
+                    throw new IllegalStateException("작년 또는 올해 연차 갯수가 부족합니다.");
                 }
             }
         } else {
-            if (param.getDayOffType().equals(DayOffType.ANNUAL_DAY_OFF)) {
-                if (myDayOff.get(1).getAnnualDayOff() - minusDays < 0) {
-                    throw new IllegalStateException("올해 연차를 모두 소진하였습니다.");
+            if (param.getDayOffType().equals(DayOffType.SPECIAL_DAY_OFF)) {
+                if (myDayOff.get(0).getSpecialDayOff() - minusDays < 0) {
+                    throw new IllegalStateException("올해 연차가 부족합니다.");
                 }
             } else {
-                if (myDayOff.get(1).getSpecialDayOff() - minusDays < 0) {
-                    throw new IllegalStateException("올해 연차를 모두 소진하였습니다.");
+                if (myDayOff.get(0).getAnnualDayOff() - minusDays < 0) {
+                    throw new IllegalStateException("올해 연차가 부족합니다.");
                 }
             }
         }
@@ -211,11 +225,13 @@ public class DayOffApplyService {
                 .startDate(param.getStartDate())
                 .endDate(param.getEndDate())
                 .employee((Employee) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .minusDays(minusDays)
+                .minusDays(minusDays + lastMinusDays)
+                .thisYearMinusDays(minusDays)
+                .lastYearMinusDays(lastMinusDays)
                 .build();
     }
 
-    private static boolean isWeekend(LocalDate date) {
+    private boolean isWeekend(LocalDate date) { // 주말 여부 판단
         Calendar cal = Calendar.getInstance();
         cal.setTime(Date.valueOf(date));
         return cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY;
