@@ -20,6 +20,7 @@ import project.hrpjt.employee.repository.EmployeeRepository;
 import project.hrpjt.holiday.entity.Holidays;
 import project.hrpjt.holiday.repository.HolidayRepository;
 import project.hrpjt.organization.dto.OrganizationFindDto;
+import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
 
 import java.sql.Date;
@@ -238,17 +239,14 @@ public class DayOffApplyService {
     }
 
     private List<Long> getOrgIds(Employee loginEmp) {
-        List<OrganizationFindDto> allOrg = organizationRepository.findAllOrg(loginEmp.getOrganization().getId());  // 조직장의 하위 조직 정보 추출
+        List<Organization> allOrg = organizationRepository.findAllOrg(loginEmp.getOrganization().getId());  // 조직장의 하위 조직 정보 추출
 
         List<Long> orgIds = new ArrayList<>();
 
         allOrg.stream().forEach(o -> {
             orgIds.add(o.getId());
-
-            o.getChild().stream().forEach(c -> {
-                orgIds.add(c.getId());
-            });
         });
+
         return orgIds;
     }
 }
