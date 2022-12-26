@@ -28,44 +28,17 @@ public class OrganizationRepositoryCustomImpl implements OrganizationRepositoryC
     }
 
     @Override
-    public List<OrganizationFindDto> findAllOrg(Long orgId) {
-//            List<Organization> organizationList = entityManager.createQuery("select o from Organization o" +
-//                            " left join fetch o.parent p" +
-//                            " where :current between o.startDate and o.endDate" +
-//                            " order by o.orgNo asc", Organization.class).setParameter("current", LocalDate.now())
-//                    .getResultList();
-
-        List<Organization> organizationList = entityManager.createNativeQuery(
-                getSqlString(), Organization.class).setParameter("org_id", orgId).getResultList();
-
-        List<OrganizationFindDto> dtoList = new ArrayList<>();
-        Map<Long, OrganizationFindDto> map = new HashMap<>();
-
-        organizationList.stream()
-                .forEach(o -> {
-                    OrganizationFindDto organizationFindDto = new OrganizationFindDto(o);
-
-                    if (o.getParent() != null) {
-                        organizationFindDto.setParentId(o.getParent().getId());
-                    }
-
-                    map.put(organizationFindDto.getId(), organizationFindDto);
-
-
-                    if (o.getParent() != null  && map.size() > 1) { // 첫번째 요소인지 판별
-                        map.get(o.getParent().getId()).getChild().add(organizationFindDto);
-                    } else {
-                        dtoList.add(organizationFindDto);
-                    }
-                });
-
-        return dtoList;
+    public List<Organization> findAllOrg(Long orgId) {
+        return entityManager.createNativeQuery(getSqlString(), Organization.class)
+                .setParameter("org_id", orgId)
+                .getResultList();
     }
 
     @Override
     public List<OrganizerFindDto> findOrganizerByParam(OrganizerFindParamDto param) {
-        List<Organization> list = entityManager.createNativeQuery(
-                getSqlString(), Organization.class).setParameter("org_id", param.getOrgId()).getResultList();
+        List<Organization> list = entityManager.createNativeQuery(getSqlString(), Organization.class)
+                .setParameter("org_id", param.getOrgId())
+                .getResultList();
 
         List<OrganizerFindDto> dtoList = new ArrayList<>();
         Map<Long, OrganizerFindDto> map = new HashMap<>();

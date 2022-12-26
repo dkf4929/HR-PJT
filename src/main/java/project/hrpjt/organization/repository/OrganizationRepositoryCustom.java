@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface OrganizationRepositoryCustom {
-    public List<OrganizationFindDto> findAllOrg(Long orgId);
+    public List<Organization> findAllOrg(Long orgId);
 
     public List<OrganizerFindDto> findOrganizerByParam(OrganizerFindParamDto param);
 
