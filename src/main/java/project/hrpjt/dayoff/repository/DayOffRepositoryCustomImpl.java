@@ -25,6 +25,7 @@ public class DayOffRepositoryCustomImpl implements DayOffRepositoryCustom {
         return queryFactory
                 .selectFrom(dayOff)
                 .where(dayOff.employee.eq(employee).and(dayOff.year.in(years)))
+                .orderBy(dayOff.year.asc())
                 .fetch();
     }
 
