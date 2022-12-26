@@ -46,7 +46,7 @@ public class AppointmentServiceTest {
     }
 
     @Test
-    @DisplayName("발령 history 조회")
+    @DisplayName("발령이력 조회")
     void appointmentList() throws Exception {
         Page<AppointmentFindDto> all = appointmentService.findAllByParam(null, null, PageRequest.of(1, 50));
 
@@ -77,6 +77,8 @@ public class AppointmentServiceTest {
 
         Page<AppointmentFindDto> all = appointmentService.findAllApprList(PageRequest.of(1, 50));
 
+        System.out.println("all.getContent() = " + all.getContent());
+
         assertThat(all.getContent()).contains(savedDto);
     }
 
@@ -95,17 +97,17 @@ public class AppointmentServiceTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 조직장이 총무팀 조직 이동 발령 승인
-        appointmentService.approve(23L, PageRequest.of(1, 10));
+        appointmentService.approve(37L, PageRequest.of(1, 10));
 
-        Appointment appointment = appointmentRepository.findById(23L).get();
+        Appointment appointment = appointmentRepository.findById(37L).get();
         assertThat(appointment.getApprovementStatus()).isEqualTo(ApprovementStatus.CEO_PENDING_APPR); // CEO 승인대기 상태로 변경.
 
         // 시스템 관리자 권한으로 로그인
         each();
 
-        appointmentService.approve(23L, PageRequest.of(1, 10)); // 시스템 관리자 조직 이동 발령 승인
+        appointmentService.approve(37L, PageRequest.of(1, 10)); // 시스템 관리자 조직 이동 발령 승인
 
-        Appointment appr = appointmentRepository.findById(23L).get();
+        Appointment appr = appointmentRepository.findById(37L).get();
         assertThat(appr.getApprovementStatus()).isEqualTo(ApprovementStatus.APPR); // 최종승인 상태로 변경.
 
         assertThat(appr.getTransOrg()).isEqualTo(appr.getEmployee().getOrganization()); // 최종 승인된 조직과 직원 엔터티의 조직이 같은지 확인.

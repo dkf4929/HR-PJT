@@ -51,6 +51,7 @@ public class EmployeeServiceTest {
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
                 .password("1234")
+                .hireDate(LocalDate.now())
                 .birthDate(LocalDate.now())
                 .build();
 
