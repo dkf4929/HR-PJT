@@ -17,9 +17,7 @@ import project.hrpjt.organization.repository.OrganizationRepository;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,7 +52,30 @@ public class OrganizationService {
 
 
     public List<OrganizationFindDto> findAll(Long orgId) {
-        return organizationRepository.findAllOrg(orgId);
+        List<Organization> organizationList = organizationRepository.findAllOrg(orgId);
+
+        List<OrganizationFindDto> dtoList = new ArrayList<>();
+        Map<Long, OrganizationFindDto> map = new HashMap<>();
+
+        organizationList.stream()
+                .forEach(o -> {
+                    OrganizationFindDto organizationFindDto = new OrganizationFindDto(o);
+
+                    if (o.getParent() != null) {
+                        organizationFindDto.setParentId(o.getParent().getId());
+                    }
+
+                    map.put(organizationFindDto.getId(), organizationFindDto);
+
+
+                    if (o.getParent() != null  && map.size() > 1) { // 첫번째 요소인지 판별
+                        map.get(o.getParent().getId()).getChild().add(organizationFindDto);
+                    } else {
+                        dtoList.add(organizationFindDto);
+                    }
+                });
+
+        return dtoList;
     }
 
     public Page<OrganizerFindDto> findOrganizerByParam(Pageable pageable) {
@@ -100,9 +121,30 @@ public class OrganizationService {
             throw new IllegalStateException("해당 부서 또는 하위 부서에 소속된 사원이 있습니다.");
         }
 
-        List<OrganizationFindDto> orgList = organizationRepository.findAllOrg(null);  // 전체 조직도 조회
+        List<Organization> orgList = organizationRepository.findAllOrg(null);  // 전체 조직도 조회
 
-        return new PageImpl<>(orgList, pageable, orgList.size());
+        List<OrganizationFindDto> dtoList = new ArrayList<>();
+        Map<Long, OrganizationFindDto> map = new HashMap<>();
+
+        orgList.stream()
+                .forEach(o -> {
+                    OrganizationFindDto organizationFindDto = new OrganizationFindDto(o);
+
+                    if (o.getParent() != null) {
+                        organizationFindDto.setParentId(o.getParent().getId());
+                    }
+
+                    map.put(organizationFindDto.getId(), organizationFindDto);
+
+
+                    if (o.getParent() != null  && map.size() > 1) { // 첫번째 요소인지 판별
+                        map.get(o.getParent().getId()).getChild().add(organizationFindDto);
+                    } else {
+                        dtoList.add(organizationFindDto);
+                    }
+                });
+
+        return new PageImpl<>(dtoList, pageable, dtoList.size());
     }
 
     private Organization dtoToEntity(OrganizationSaveDto dto) {

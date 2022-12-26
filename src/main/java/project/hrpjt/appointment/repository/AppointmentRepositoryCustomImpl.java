@@ -9,6 +9,7 @@ import project.hrpjt.appointment.entity.Appointment;
 import project.hrpjt.appointment.entity.QAppointment;
 import project.hrpjt.employee.entity.Employee;
 import project.hrpjt.organization.dto.OrganizationFindDto;
+import project.hrpjt.organization.entity.Organization;
 import project.hrpjt.organization.repository.OrganizationRepository;
 
 import javax.persistence.EntityManager;
@@ -178,6 +179,7 @@ public class AppointmentRepositoryCustomImpl implements AppointmentRepositoryCus
                 .map(o -> {
                     return AppointmentFindDto.builder()
                             .appointmentType(o.getAppointmentType())
+                            .appointmentId(o.getId())
                             .startDate(o.getStartDate())
                             .transOrg(o.getTransOrg())
                             .approvementStatus(o.getApprovementStatus())
@@ -190,16 +192,11 @@ public class AppointmentRepositoryCustomImpl implements AppointmentRepositoryCus
     }
 
     private List<Long> getIds(Employee loginEmp) {
-        List<OrganizationFindDto> allOrg = organizationRepository.findAllOrg(loginEmp.getOrganization().getId());  // 조직장의 하위 조직 정보 추출
-
+        List<Organization> allOrg = organizationRepository.findAllOrg(loginEmp.getOrganization().getId());  // 조직장의 하위 조직 정보 추출
         List<Long> orgIds = new ArrayList<>();
 
         allOrg.stream().forEach(o -> {
             orgIds.add(o.getId());
-
-            o.getChild().stream().forEach(c -> {
-                orgIds.add(c.getId());
-            });
         });
         return orgIds;
     }
