@@ -33,9 +33,21 @@ public class LoginController {
         return "kakao/kakaoLogin";
     }
 
-    @RequestMapping("/login/kakao")
-    public String kakaoLogin(String code, HttpServletResponse response) throws ParseException {
+    @PostMapping("/login/kakao")
+    public String kakaoLogin(String code, HttpServletResponse response) {
         return "redirect:" + loginService.kakaoLogin(code, response);
+    }
+
+    @GetMapping("/password_search")
+    public String passwordSearchForm() {
+        return "password-search";
+    }
+
+    @ResponseBody
+    @PostMapping("/password_search")
+    public String passwordSearch(String empNo) {
+        loginService.passwordSearch(empNo);
+        return "메일이 발송되었습니다. 임시 비밀번호로 로그인하세요.";
     }
 
     @GetMapping("/test")
