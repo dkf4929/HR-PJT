@@ -129,6 +129,7 @@ public class TestData {
                 .birthDate(LocalDate.of(1970, 01, 01))
                 .empNm("ADMIN")
                 .gender("M")
+                .externalMail("dkf4928@naver.com")
                 .role("ROLE_SYS_ADMIN")
                 .hireDate(LocalDate.of(1990, 01, 01))
                 .password("1234")
@@ -138,6 +139,7 @@ public class TestData {
                 .empNo("ORG_LEADER")
                 .birthDate(LocalDate.of(1970, 01, 01))
                 .empNm("ORG_LEADER")
+                .externalMail("dkf4929@nate.com")
                 .gender("M")
                 .role("ROLE_ORG_LEADER")
                 .hireDate(LocalDate.of(1990, 01, 01))
@@ -148,6 +150,7 @@ public class TestData {
                 .empNo("EMPLOYEE")
                 .birthDate(LocalDate.of(2000, 01, 01))
                 .empNm("EMPLOYEE")
+                .externalMail("sng4929@naver.com")
                 .gender("M")
                 .role("ROLE_EMPLOYEE")
                 .hireDate(LocalDate.of(2022, 01, 01))
@@ -188,6 +191,11 @@ public class TestData {
         Attendance attend5 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2022).tardy(0).leaveEarly(0).employee(save).build());
         Attendance attend6 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2021).tardy(2).leaveEarly(0).employee(save).build());
         Attendance attend7 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2020).tardy(0).leaveEarly(3).employee(save).build());
+        Attendance attend8 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2021).tardy(0).leaveEarly(3).employee(save1).build());
+        Attendance attend9 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2021).tardy(2).leaveEarly(3).employee(save2).build());
+        Attendance attend10 = attendanceRepository.save(Attendance.builder().absenteeism(2).year(2021).tardy(8).leaveEarly(0).employee(save3).build());
+        Attendance attend11 = attendanceRepository.save(Attendance.builder().absenteeism(0).year(2021).tardy(0).leaveEarly(1).employee(save4).build());
+        Attendance attend12 = attendanceRepository.save(Attendance.builder().absenteeism(1).year(2021).tardy(3).leaveEarly(0).employee(save5).build());
 
         dayOffRepository.save(DayOff.builder().attendance(attend1).employee(attend1.getEmployee()).build());
         dayOffRepository.save(DayOff.builder().attendance(attend2).employee(attend2.getEmployee()).build());
@@ -196,6 +204,11 @@ public class TestData {
         dayOffRepository.save(DayOff.builder().attendance(attend5).employee(attend5.getEmployee()).build());
         dayOffRepository.save(DayOff.builder().attendance(attend6).employee(attend6.getEmployee()).build());
         dayOffRepository.save(DayOff.builder().attendance(attend7).employee(attend7.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend8).employee(attend8.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend9).employee(attend9.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend10).employee(attend10.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend11).employee(attend11.getEmployee()).build());
+        dayOffRepository.save(DayOff.builder().attendance(attend12).employee(attend12.getEmployee()).build());
 
         AppointmentSaveDto app1 = AppointmentSaveDto.builder()
                 .type(AppointmentType.ORG)
@@ -295,11 +308,11 @@ public class TestData {
         appointmentService.save(app9);
         appointmentService.save(app10);
 
-        appointmentService.approve(31L, null);
-        appointmentService.approve(34L, null);
-        appointmentService.approve(35L, null);
-        appointmentService.approve(36L, null);
-        appointmentService.approve(38L, null);
+        appointmentService.approve(41L, null);
+        appointmentService.approve(44L, null);
+        appointmentService.approve(45L, null);
+        appointmentService.approve(46L, null);
+        appointmentService.approve(48L, null);
 
         holidayRepository.save(Holidays.builder().holiday(LocalDate.of(2022, 12, 30)).reason("종무식").build());
         holidayRepository.save(Holidays.builder().holiday(LocalDate.of(2023, 01, 02)).reason("창립기념일").build());
