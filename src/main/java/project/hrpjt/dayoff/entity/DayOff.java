@@ -3,6 +3,7 @@ package project.hrpjt.dayoff.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import project.hrpjt.attendance.entity.Attendance;
 import project.hrpjt.base.SubEntity;
 import project.hrpjt.employee.entity.Employee;
@@ -17,6 +18,7 @@ import javax.persistence.*;
                 @UniqueConstraint(name = "uniqueDayOff", columnNames = {"employee_id", "year"})
         }
 )
+@ToString(of = {"id", "year", "annualDayOff", "specialDayOff"})
 public class DayOff extends SubEntity {
     @Id @GeneratedValue
     @Column(name = "dayoff_id")
