@@ -6,6 +6,7 @@ import project.hrpjt.dayoff.entity.QDayOff;
 import project.hrpjt.employee.entity.Employee;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,5 +38,15 @@ public class DayOffRepositoryCustomImpl implements DayOffRepositoryCustom {
                         .where(dayOff.employee.eq(employee).and(dayOff.year.eq(year)))
                         .fetchOne()
         );
+    }
+
+    @Override
+    public List<DayOff> findUseTarget() {
+        return queryFactory
+                .select(dayOff)
+                .from(dayOff)
+                .join(dayOff.employee).fetchJoin()
+                .where(dayOff.annualDayOff.goe(10).and(dayOff.year.eq(LocalDate.now().getYear())))
+                .fetch();
     }
 }

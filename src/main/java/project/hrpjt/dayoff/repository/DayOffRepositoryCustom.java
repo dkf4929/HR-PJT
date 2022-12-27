@@ -10,4 +10,6 @@ public interface DayOffRepositoryCustom {
     public List<DayOff> findMyDayOff(Employee employee, List<Integer> years);
 
     public Optional<DayOff> findDayOff(Employee employee, int year);
+
+    public List<DayOff> findUseTarget();
 }
