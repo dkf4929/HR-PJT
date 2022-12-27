@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import project.hrpjt.dayoffapply.dto.DayOffApplyFindDto;
 import project.hrpjt.dayoffapply.dto.DayOffApplySaveDto;
 import project.hrpjt.dayoffapply.service.DayOffApplyService;
+import project.hrpjt.mail.MailSender;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
