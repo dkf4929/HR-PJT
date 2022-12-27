@@ -26,4 +26,5 @@ public class EmployeeSaveDto {
     private LocalDate hireDate;
     private String kakaoMail;
     private String kakaoId;
+    private String externalMail;
 }

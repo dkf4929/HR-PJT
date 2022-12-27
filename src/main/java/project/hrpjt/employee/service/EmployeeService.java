@@ -125,6 +125,7 @@ public class EmployeeService {
                 .kakaoMail(param.getKakaoMail())
                 .hireDate(param.getHireDate())
                 .kakaoId(param.getKakaoId())
+                .externalMail(param.getExternalMail())
                 .role(param.getRole())
                 .birthDate(param.getBirthDate())
                 .gender(param.getGender())

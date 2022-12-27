@@ -54,6 +54,9 @@ public class Employee extends SubEntity implements UserDetails {
     private String kakaoMail;
     private String kakaoId;
 
+    @Email
+    private String externalMail;
+
     @OneToMany(mappedBy = "employee")
     private List<Family> families = new ArrayList<>();
 
@@ -71,7 +74,7 @@ public class Employee extends SubEntity implements UserDetails {
     }
 
     @Builder
-    public Employee(String empNo, String password, String role, String empNm, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId) {
+    public Employee(String empNo, String password, String role, String empNm, String gender, LocalDate birthDate, LocalDate hireDate, LocalDate retireDate, String kakaoMail, String kakaoId, String externalMail) {
         this.empNo = empNo;
         this.password = password;
         this.role = role;
@@ -82,6 +85,7 @@ public class Employee extends SubEntity implements UserDetails {
         this.retireDate = retireDate;
         this.kakaoMail = kakaoMail;
         this.kakaoId = kakaoId;
+        this.externalMail = externalMail;
 //        this.organization = organization;
     }
 
