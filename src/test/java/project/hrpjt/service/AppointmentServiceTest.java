@@ -97,17 +97,17 @@ public class AppointmentServiceTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 조직장이 총무팀 조직 이동 발령 승인
-        appointmentService.approve(37L, PageRequest.of(1, 10));
+        appointmentService.approve(47L, PageRequest.of(1, 10));
 
-        Appointment appointment = appointmentRepository.findById(37L).get();
+        Appointment appointment = appointmentRepository.findById(47L).get();
         assertThat(appointment.getApprovementStatus()).isEqualTo(ApprovementStatus.CEO_PENDING_APPR); // CEO 승인대기 상태로 변경.
 
         // 시스템 관리자 권한으로 로그인
         each();
 
-        appointmentService.approve(37L, PageRequest.of(1, 10)); // 시스템 관리자 조직 이동 발령 승인
+        appointmentService.approve(47L, PageRequest.of(1, 10)); // 시스템 관리자 조직 이동 발령 승인
 
-        Appointment appr = appointmentRepository.findById(37L).get();
+        Appointment appr = appointmentRepository.findById(47L).get();
         assertThat(appr.getApprovementStatus()).isEqualTo(ApprovementStatus.APPR); // 최종승인 상태로 변경.
 
         assertThat(appr.getTransOrg()).isEqualTo(appr.getEmployee().getOrganization()); // 최종 승인된 조직과 직원 엔터티의 조직이 같은지 확인.
