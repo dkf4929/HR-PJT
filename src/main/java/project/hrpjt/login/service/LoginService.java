@@ -93,7 +93,7 @@ public class LoginService {
 
         if (employee.isPresent()) {
             List<String> list = new ArrayList<String>();
-            list.add("ROLE_EMPLOYEE");
+            list.add("role-empLOYEE");
 
             String kakaoToken = jwtTokenProvider.createToken(employee.get().getKakaoMail(), list);
 

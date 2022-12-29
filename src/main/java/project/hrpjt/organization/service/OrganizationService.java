@@ -157,7 +157,7 @@ public class OrganizationService {
     }
 
     private List<OrganizerFindDto> getOrganizer(Organization organization, String role, List<OrganizerFindDto> list) {
-        if (role.equals("ROLE_EMPLOYEE")) {
+        if (role.equals("role-empLOYEE")) {
             OrganizerFindDto dto = OrganizerFindDto.builder()
                     .orgNo(organization.getOrgNo())
                     .orgNm(organization.getOrgNm())

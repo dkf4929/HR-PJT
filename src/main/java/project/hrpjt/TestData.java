@@ -152,7 +152,7 @@ public class TestData {
                 .empNm("EMPLOYEE")
                 .externalMail("sng4929@naver.com")
                 .gender("M")
-                .role("ROLE_EMPLOYEE")
+                .role("role-empLOYEE")
                 .hireDate(LocalDate.of(2022, 01, 01))
                 .password("1234")
                 .build();
@@ -162,7 +162,7 @@ public class TestData {
                 .birthDate(LocalDate.of(2000, 01, 01))
                 .empNm("EMPLOYEE2")
                 .gender("M")
-                .role("ROLE_EMPLOYEE")
+                .role("role-empLOYEE")
                 .hireDate(LocalDate.of(2022, 01, 01))
                 .password("1234")
                 .build();

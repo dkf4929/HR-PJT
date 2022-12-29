@@ -23,7 +23,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @ApiOperation(value = "회원 저장")
-    @PostMapping("role_adm/employees") //회원 저장
+    @PostMapping("role-adm/employees") //회원 저장
     public String save(@RequestBody @Valid EmployeeSaveDto param) {
         employeeService.save(param);
         return "저장완료";
@@ -32,7 +32,7 @@ public class EmployeeController {
     @ApiOperation(
             value = "회원 검색",
             notes = "로그인한 사원의 정보를 조회한다.")
-    @GetMapping("role_emp/employees")
+    @GetMapping("role-emp/employees")
     public EmployeeFindDto findEmployee() {
         Employee employee = (Employee) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); //로그인한 사용자 가져오기
         return employeeService.findEmployee(employee.getId());
@@ -41,7 +41,7 @@ public class EmployeeController {
     @ApiOperation(
             value = "모든 회원 조회",
             notes = "등록되어 있는 모든 회원을 조회한다. (시스템 관리자 또는 ceo 권한을 가진 직원만 기능 사용 가능)")
-    @GetMapping("/role_adm/employees")
+    @GetMapping("/role-adm/employees")
     public Page<EmployeeFindDto> findAllEmployees(Pageable pageable) {
         return employeeService.findAll(pageable);
     }
@@ -54,7 +54,7 @@ public class EmployeeController {
             value = "직원 정보 수정",
             notes = "직원의 정보를 수정한다.(권한에 따라서 수정할 수 있는 항목 다름)"
     )
-    @PutMapping("/role_emp/employees")
+    @PutMapping("/role-emp/employees")
     public EmployeeFindDto editInfo(@RequestBody EmployeeUpdateDto param) {
         return employeeService.edit(param);
     }
