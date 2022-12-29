@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class AppointmentController {
     private final AppointmentService appointmentService;
 
-    @PostMapping("/role_lead/appointment")
+    @PostMapping("/role-lead/appointment")
     @ApiOperation(
             value = "발령 등록",
             notes = "발령을 등록한다.(조직장 또는 시스템 관리자 기능)")
@@ -30,7 +30,7 @@ public class AppointmentController {
 
 //  조직장 -> 본인 부서원의 발령 및 본인 부서 이동 발령만 조회.
 //  시스템 관리자 -> 모든 발령 정보 조회.
-    @GetMapping("/role_lead/appointment")
+    @GetMapping("/role-lead/appointment")
     @ApiOperation(
             value = "발령 내역 조회",
             notes = "직원의 발령 정보를 조회한다.")
@@ -39,7 +39,7 @@ public class AppointmentController {
     }
 
     //  로그인한 직원 발령 조회
-    @GetMapping("/role_emp/appointment")
+    @GetMapping("/role-emp/appointment")
     @ApiOperation(
             value = "내 발령 이력 조회",
             notes = "로그인한 직원의 발령 정보를 조회한다.")
@@ -47,7 +47,7 @@ public class AppointmentController {
         return appointmentService.findMyAppointment(pageable);
     }
 
-    @GetMapping("/role_lead/approve")
+    @GetMapping("/role-lead/approve")
     @ApiOperation(
             value = "승인 대기 항목",
             notes = "관리자가 승인또는 반려할 수 있는 발령 리스트 조회"
@@ -56,7 +56,7 @@ public class AppointmentController {
         return appointmentService.findAllApprList(pageable);
     }
 
-    @PutMapping("/role_lead/approve/{appId}")
+    @PutMapping("/role-lead/approve/{appId}")
     @ApiOperation(
             value = "발령 승인",
             notes = "조직장 또는 시스템 관리자/CEO가 발령 승인."

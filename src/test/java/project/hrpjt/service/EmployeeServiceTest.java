@@ -49,7 +49,7 @@ public class EmployeeServiceTest {
                 .empNo("userA")
                 .empNm("userA")
                 .gender("M")
-                .role("ROLE_EMPLOYEE")
+                .role("role-empLOYEE")
                 .password("1234")
                 .hireDate(LocalDate.now())
                 .birthDate(LocalDate.now())

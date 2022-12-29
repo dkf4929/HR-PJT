@@ -20,10 +20,10 @@ import project.hrpjt.security.tokenmanager.JwtTokenProvider;
 @Slf4j
 public class WebSecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
-    private final String[] whiteList = {"/", "/login", "/login/kakao", "/kakao", "/logout", "/password_search"};  // security 적용 안할 path 설정
-    private final String[] adminPath = {"/role_adm/**"}; // 관리자 허용 path
-    private final String[] leaderPath = {"/role_lead/**"};
-    private final String[] userPath = {"/role_emp/**"}; // 직원 허용 path
+    private final String[] whiteList = {"/", "/login", "/login/kakao", "/kakao", "/logout", "/password-search"};  // security 적용 안할 path 설정
+    private final String[] adminPath = {"/role-adm/**"}; // 관리자 허용 path
+    private final String[] leaderPath = {"/role-lead/**"};
+    private final String[] userPath = {"/role-emp/**"}; // 직원 허용 path
     private final UserOAuth2Service userOAuth2Service;
     private final AccessDeniedHandler accessDeniedHandler;
 

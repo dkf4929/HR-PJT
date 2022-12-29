@@ -49,7 +49,7 @@ public class DayOffApplyService {
 
         List<DayOffApply> list = new ArrayList<>();
 
-        if (role.equals("ROLE_EMPLOYEE")) {
+        if (role.equals("role-empLOYEE")) {
             list = dayOffApplyRepository.findByEmpId(loginEmp.getId());
         } else if (role.equals("ROLE_ORG_LEADER")) {
             list = dayOffApplyRepository.findByOrgIds(getOrgIds(loginEmp));

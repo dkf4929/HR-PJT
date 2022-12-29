@@ -16,7 +16,7 @@ public class HolidaysController {
     @ApiOperation(value = "휴일 입력",
         notes = "관리자가 휴일을 등록한다."
     )
-    @PostMapping("/role_adm/holiday")
+    @PostMapping("/role-adm/holiday")
     public String save(@RequestBody HolidaysSaveDto param) {
         holidaysService.save(param);
 

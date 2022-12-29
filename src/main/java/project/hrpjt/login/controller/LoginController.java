@@ -38,13 +38,13 @@ public class LoginController {
         return "redirect:" + loginService.kakaoLogin(code, response);
     }
 
-    @GetMapping("/password_search")
+    @GetMapping("/password-search")
     public String passwordSearchForm() {
         return "password-search";
     }
 
     @ResponseBody
-    @PostMapping("/password_search")
+    @PostMapping("/password-search")
     public String passwordSearch(String empNo) {
         loginService.passwordSearch(empNo);
         return "메일이 발송되었습니다. 임시 비밀번호로 로그인하세요.";

@@ -15,7 +15,7 @@ public class DayOffController {
             value = "연차촉진 메일 발송",
             notes = "현재년도 기준 잔여연차가 10일 이상 남은 직원들에게 연차사용 촉진 메일 발송"
     )
-    @PostMapping("/role_adm/day_off/mail")
+    @PostMapping("/role-adm/day-off/mail")
     public String sendMail() {
         dayOffService.sendMail();
 
